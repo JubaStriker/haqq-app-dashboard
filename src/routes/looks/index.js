@@ -393,7 +393,7 @@ function Looks(props) {
         return (
           <Flex direction="column">
             <Text>
-              "Hedera Coupon" widget <b>has been added</b> to your store page.
+              "HBAR Coupon" widget <b>has been added</b> to your store page.
               &nbsp;
             </Text>
             <Text
@@ -408,7 +408,7 @@ function Looks(props) {
       } else {
         return (
           <Text>
-            "Hedera Coupon" widget is <b>not added</b> to your store page.
+            "HBAR Coupon" widget is <b>not added</b> to your store page.
           </Text>
         );
       }
@@ -497,7 +497,7 @@ function Looks(props) {
           >
             <Stack>
               <Text>
-                The Hedera Coupon widget on your store has{" "}
+                The HBAR Coupon widget on your store has{" "}
                 <b>{chargesState.get.success.data.views.count}</b> views{" "}
               </Text>
               <Text>

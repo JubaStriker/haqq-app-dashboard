@@ -41,8 +41,12 @@ const SettingsRoute = () => {
   const hBarWalletAddress = useWalletStore((state) => state.walletState);
   const getWalletAddress = useWalletStore((state) => state.getWalletAddress);
   const postWalletAddress = useWalletStore((state) => state.postWalletAddress);
-  const verifyWalletAddress = useWalletStore((state) => state.verifyWalletAddress);
-
+  const verifyWalletAddress = useWalletStore(
+    (state) => state.verifyWalletAddress
+  );
+  const fetchWalletAddress = useWalletStore(
+    (state) => state.fetchWalletAddress
+  );
 
   const onSubmitHandler = async (data) => {
     const walletAddress = data;
@@ -72,6 +76,13 @@ const SettingsRoute = () => {
     }
   };
 
+  
+
+  const connectWallet = () => {
+    console.log('Hello World');
+    fetchWalletAddress();
+  }
+
   const walletSchema = Yup.object().shape({
     walletAddress: Yup.string().required("Wallet Address Is required"),
   });
@@ -89,12 +100,15 @@ const SettingsRoute = () => {
   useEffect(() => {
     getWalletAddress(shop);
     getScripts(shop);
+    fetchWalletAddress();
   }, []);
 
-
   useEffect(() => {
-      formik.setFieldValue("walletAddress", hBarWalletAddress?.get?.success?.data?.walletAddress || "")
-  }, [hBarWalletAddress?.get?.success?.data?.walletAddress])
+    formik.setFieldValue(
+      "walletAddress",
+      hBarWalletAddress?.get?.success?.data?.walletAddress || ""
+    );
+  }, [hBarWalletAddress?.get?.success?.data?.walletAddress]);
 
   const enableWidget = async () => {
     try {
@@ -114,8 +128,8 @@ const SettingsRoute = () => {
   const HbarAddressInput = () => {
     if (hBarWalletAddress.get.loading) {
       return (
-        <Box width={'100%'} alignItems="center">
-          <SkeletonText mt='4' noOfLines={4} spacing='4' />
+        <Box width={"100%"} alignItems="center">
+          <SkeletonText mt="4" noOfLines={4} spacing="4" />
         </Box>
       );
     } else if (hBarWalletAddress.get.success.ok) {
@@ -150,6 +164,8 @@ const SettingsRoute = () => {
               )}
             </FormHelperText>
           </FormControl>
+
+          <Button onClick={() => {connectWallet()}} >Connect to HBAR Wallet</Button>
 
           <Button
             mt={4}
@@ -230,9 +246,9 @@ const SettingsRoute = () => {
                 Widget Embed Settings
               </Text>
               <Text mt="4" fontSize="sm">
-                Enable or disable "Hedera Coupon" widget on your store. The
-                widget gets appended to the bottom of your store page above the
-                footer on the home page.
+                Enable or disable "HBAR Coupon" widget on your store. The widget
+                gets appended to the bottom of your store page above the footer
+                on the home page.
               </Text>
               <ButtonGroup mt="4" spacing="6">
                 {renderButton()}
