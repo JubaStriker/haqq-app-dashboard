@@ -44,10 +44,7 @@ const SettingsRoute = () => {
   const verifyWalletAddress = useWalletStore(
     (state) => state.verifyWalletAddress
   );
-  const fetchWalletAddress = useWalletStore(
-    (state) => state.fetchWalletAddress
-  );
-
+ 
   const onSubmitHandler = async (data) => {
     const walletAddress = data;
     await verifyWalletAddress(walletAddress);
@@ -76,12 +73,6 @@ const SettingsRoute = () => {
     }
   };
 
-  
-
-  const connectWallet = () => {
-    console.log('Hello World');
-    fetchWalletAddress();
-  }
 
   const walletSchema = Yup.object().shape({
     walletAddress: Yup.string().required("Wallet Address Is required"),
@@ -99,8 +90,7 @@ const SettingsRoute = () => {
 
   useEffect(() => {
     getWalletAddress(shop);
-    getScripts(shop);
-    fetchWalletAddress();
+    getScripts(shop); 
   }, []);
 
   useEffect(() => {
@@ -164,9 +154,6 @@ const SettingsRoute = () => {
               )}
             </FormHelperText>
           </FormControl>
-
-          <Button onClick={() => {connectWallet()}} >Connect to HBAR Wallet</Button>
-
           <Button
             mt={4}
             onClick={formik.handleSubmit}

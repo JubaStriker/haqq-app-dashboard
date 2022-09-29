@@ -3,6 +3,7 @@ import axios from "axios";
 import produce from "immer";
 import { INTERNAL_SERVER_ERROR } from "../../constants/strings";
 import Parse from "parse";
+import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 import { HashConnect } from "hashconnect";
 import { AwesomeQR } from "awesome-qr";
 
@@ -104,99 +105,7 @@ const useWalletStore = create((set, address) => ({
       );
     }
   },
-  fetchWalletAddress: async () => {
-    // set(
-    //   produce((state) => ({
-    //     ...state,
-    //     walletState: {
-    //       ...state.walletState,
-    //       get: {
-    //         ...INITIAL_WALLET_STATE.get,
-    //         loading: true,
-    //       },
-    //     },
-    //   }))
-    // );
-    try {
-      let hashConnect = new HashConnect();
-      window.hashConnect = hashConnect
-      console.log("Hash Connect Data", hashConnect);
-      const appMetadata = {
-        name: "HBar Shop",
-        description: "An example hedera dApp",
-        icon: "https://absolute.url/to/icon.png",
-        url: "https://9516-171-76-213-73.in.ngrok.io"
-      };
-
-      const initData = await hashConnect.init(appMetadata, "testnet", false);
-      
-      // console.log('asdasd')
-      // let qrcode = "";
-      // const ScanCode = await new AwesomeQR({
-      //   text: initData.pairingString,
-      //   size: 400,
-      //   margin: 16,
-      //   maskPattern: 110,
-      //   colorLight: "#fff",
-      // })
-      //   .draw()
-      //   .then((dataURL) => {
-      //     if (dataURL) {
-      //       qrcode = dataURL.toString();
-      //     }
-      //   });
-      // console.log(qrcode);
-      console.log("Here ", hashConnect)
-      hashConnect.foundExtensionEvent.once((walletMetadata) => {
-        console.log("WALLET METADAT ", walletMetadata)
-        hashConnect.connectToLocalWallet(
-          initData.pairingString,
-          walletMetadata
-        );
-      }, (err) => console.error(err));
-      let walletAddress = "";
-      hashConnect.pairingEvent.once((pairingData) => {
-        console.log("Paired Data: ", pairingData);
-        pairingData.accountIds.forEach((id) => {
-          walletAddress = id;
-          console.log(walletAddress);
-        });
-        //   // set(
-        //   //   produce((state) => ({
-        //   //     ...state,
-        //   //     walletState: {
-        //   //       ...state.walletState,
-        //   //       get: {
-        //   //         ...INITIAL_WALLET_STATE.get,
-        //   //         success: {
-        //   //           data: walletAddress,
-        //   //           ok: true,
-        //   //         },
-        //   //       },
-        //   //     },
-        //   //   }))
-        //   // );
-      });
-    } catch (e) {
-      console.error(e);
-      // set(
-      //   produce((state) => ({
-      //     ...state,
-      //     walletState: {
-      //       ...state.walletState,
-      //       get: {
-      //         ...INITIAL_WALLET_STATE.get,
-      //         loading: false,
-      //         success:{
-      //           data: e.message,
-      //           ok: false,
-      //         }
-      //       },
-      //     },
-      //   }))
-      // );
-    }
-  },
+  
   getWalletAddress: async (shop) => {
     set(
       produce((state) => ({
