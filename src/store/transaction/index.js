@@ -45,11 +45,9 @@ const useTransactionStore = create((set) => ({
     );
 
     try {
-      // const {data} = await axios.get(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/get_shop?shop=${shop}`);
-      // const walletAddress = data.walletAddress;
-  //  console.log(walletAddress);
-  console.log(shop)
-      const url = 'https://testnet.mirrornode.hedera.com/api/v1/transactions?account.id=0.0.47870654'
+      const {data} = await axios.get(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/get_shop?shop=${shop}`);
+      const walletAddress = data.walletAddress;
+      const url = `${process.env.REACT_APP_HEDERA_ACCOUNT_VERIFY}api/v1/transactions?account.id=${walletAddress}`
       const result = await fetch(url)
       const response = await result.json();
       // console.log(response);

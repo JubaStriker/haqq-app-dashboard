@@ -1,11 +1,7 @@
 import create from "zustand";
 import axios from "axios";
 import produce from "immer";
-import { INTERNAL_SERVER_ERROR } from "../../constants/strings";
-import Parse from "parse";
-import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
-import { HashConnect } from "hashconnect";
-import { AwesomeQR } from "awesome-qr";
+
 
 const VERIFY_WALLET_STATE = {
   get: {
@@ -65,7 +61,7 @@ const useWalletStore = create((set, address) => ({
     try {
       // console.log(data);
       const fetchAccount = await fetch(
-        `https://testnet.mirrornode.hedera.com/api/v1/accounts?account.id=${data}`
+        `${process.env.REACT_APP_HEDERA_ACCOUNT_VERIFY}api/v1/accounts?account.id=${data}`
       );
       const response = await fetchAccount.json();
       console.log(response.accounts[0].account);
