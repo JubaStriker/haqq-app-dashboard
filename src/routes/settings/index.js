@@ -46,9 +46,6 @@ const SettingsRoute = () => {
   const verifyWalletAddress = useWalletStore(
     (state) => state.verifyWalletAddress
   );
-  const fetchWalletAddress = useWalletStore(
-    (state) => state.fetchWalletAddress
-  );
 
   const onSubmitHandler = async (data) => {
     const walletAddress = data;
@@ -100,7 +97,6 @@ const SettingsRoute = () => {
   useEffect(() => {
     getWalletAddress(shop);
     getScripts(shop);
-    fetchWalletAddress();
   }, []);
 
   useEffect(() => {
