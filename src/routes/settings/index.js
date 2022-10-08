@@ -21,6 +21,8 @@ import {
   Spinner,
   SkeletonText,
 } from "@chakra-ui/react";
+import Blur from "../../components/blur";
+
 import useScriptsStore from "../../store/scripts";
 import { ShopContext } from "../../context";
 import { INTERNAL_SERVER_ERROR } from "../../constants/strings";
@@ -76,12 +78,10 @@ const SettingsRoute = () => {
     }
   };
 
-  
-
   const connectWallet = () => {
-    console.log('Hello World');
+    console.log("Hello World");
     fetchWalletAddress();
-  }
+  };
 
   const walletSchema = Yup.object().shape({
     walletAddress: Yup.string().required("Wallet Address Is required"),
@@ -165,7 +165,7 @@ const SettingsRoute = () => {
             </FormHelperText>
           </FormControl>
 
-          <Button onClick={() => {connectWallet()}} >Connect to HBAR Wallet</Button>
+          {/* <Button onClick={() => {connectWallet()}} >Connect to HBAR Wallet</Button> */}
 
           <Button
             mt={4}
@@ -173,9 +173,10 @@ const SettingsRoute = () => {
             isLoading={hBarWalletAddress.post.loading}
             type="submit"
             size="sm"
-            colorScheme={"messenger"}
+            bgGradient="linear(to-bl, #594bab,#4d2c58)"
+            color="white"
           >
-            Submit
+            Save Address
           </Button>
         </Box>
       );
@@ -223,7 +224,8 @@ const SettingsRoute = () => {
           isLoading={scripts.post.loading || scripts.get.loading}
           fontWeight="bold"
           size="sm"
-          colorScheme="green"
+          bgGradient="linear(to-bl, #594bab,#4d2c58)"
+          color="white"
           onClick={enableWidget}
         >
           Add Widget To Your Store
@@ -235,7 +237,13 @@ const SettingsRoute = () => {
   return (
     <>
       <NavBar />
-      <Container maxW={"7xl"} p={[12, 6]} bg="#f6f6f7" textAlign={"left"}>
+      <Container
+        position={"relative"}
+        maxW={"7xl"}
+        p={[12, 6]}
+        bg="#f6f6f7"
+        textAlign={"left"}
+      >
         <Box as="section" maxW="3xl" mx="auto">
           <SimpleGrid spacing={4}>
             <Box bg="white" borderRadius={10} p={5} boxShadow="md">
@@ -264,9 +272,7 @@ const SettingsRoute = () => {
                     </Text>
                   </Box>
                   <Box>
-                    <Code
-                      children={`<div id="frangout-shop-look-app"> </div>`}
-                    ></Code>
+                    <Code children={`<div id="hpay-shop-app"> </div>`}></Code>
                   </Box>
                 </SimpleGrid>
               </Alert>
@@ -274,6 +280,12 @@ const SettingsRoute = () => {
           </SimpleGrid>
         </Box>
       </Container>
+      {/* <Blur
+        position={"absolute"}
+        top={30}
+        left={-10}
+        style={{ filter: "blur(70px)" }}
+      /> */}
     </>
   );
 };

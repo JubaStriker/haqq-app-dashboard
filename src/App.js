@@ -89,7 +89,7 @@ function App() {
 
   if (shopifySessionAvailable) {
     return (
-      <Box bg="#f6f6f7">
+      <Box bg="#f6f6f7" height="full">
         <NavBar />
         <LooksRoute />
       </Box>

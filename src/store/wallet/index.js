@@ -119,17 +119,21 @@ const useWalletStore = create((set, address) => ({
     // );
     try {
       let hashConnect = new HashConnect();
-      window.hashConnect = hashConnect
+      window.parent.hashConnect = hashConnect;
       console.log("Hash Connect Data", hashConnect);
       const appMetadata = {
         name: "HBar Shop",
         description: "An example hedera dApp",
         icon: "https://absolute.url/to/icon.png",
-        url: "https://9516-171-76-213-73.in.ngrok.io"
+        url: "https://9516-171-76-213-73.in.ngrok.io",
       };
 
-      const initData = await hashConnect.init(appMetadata, "testnet", false);
-      
+      const initData = await window.parent.hashConnect.init(
+        appMetadata,
+        "testnet",
+        false
+      );
+
       // console.log('asdasd')
       // let qrcode = "";
       // const ScanCode = await new AwesomeQR({
@@ -146,16 +150,19 @@ const useWalletStore = create((set, address) => ({
       //     }
       //   });
       // console.log(qrcode);
-      console.log("Here ", hashConnect)
-      hashConnect.foundExtensionEvent.once((walletMetadata) => {
-        console.log("WALLET METADAT ", walletMetadata)
-        hashConnect.connectToLocalWallet(
-          initData.pairingString,
-          walletMetadata
-        );
-      }, (err) => console.error(err));
+      console.log("Here ", hashConnect);
+      window.parent.hashConnect.foundExtensionEvent.once(
+        (walletMetadata) => {
+          console.log("WALLET METADAT ", walletMetadata);
+          hashConnect.connectToLocalWallet(
+            initData.pairingString,
+            walletMetadata
+          );
+        },
+        (err) => console.error(err)
+      );
       let walletAddress = "";
-      hashConnect.pairingEvent.once((pairingData) => {
+      window.parent.hashConnect.pairingEvent.once((pairingData) => {
         console.log("Paired Data: ", pairingData);
         pairingData.accountIds.forEach((id) => {
           walletAddress = id;

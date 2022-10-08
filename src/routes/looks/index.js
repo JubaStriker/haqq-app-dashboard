@@ -36,7 +36,7 @@ import {
   IoEye,
   IoCartSharp,
   IoLogoUsd,
-  IoWallet
+  IoWallet,
 } from "react-icons/io5";
 
 import { Link } from "react-router-dom";
@@ -138,7 +138,6 @@ const renderCarousel = ({ orangeColorMode, look }) => {
       <Box width={{ base: "100%" }} zIndex="2">
         <Carousel medias={look.medias} />
       </Box>
-      
     </Box>
   );
 };
@@ -179,7 +178,7 @@ export const renderLooks = ({ looks, orangeColorMode, getLooks }) => {
     );
   } else if (looks.get.success.data.length) {
     return looks.get.success.data.map((look) => (
-      <Box key={look.objectId} >
+      <Box key={look.objectId}>
         <Box
           marginTop={{ base: "1", sm: "5" }}
           marginBottom={{ base: "1", sm: "5" }}
@@ -188,9 +187,9 @@ export const renderLooks = ({ looks, orangeColorMode, getLooks }) => {
           justifyContent="space-between"
           key={look.objectId}
           padding="20px"
-          boxShadow={'md'}
-          borderRadius={'10px'}
-          bg={'white'}
+          boxShadow={"md"}
+          borderRadius={"10px"}
+          bg={"white"}
         >
           {renderCarousel({ orangeColorMode, look })}
           <Box
@@ -202,7 +201,7 @@ export const renderLooks = ({ looks, orangeColorMode, getLooks }) => {
           >
             {/* <BlogTags tags={['Engineering', 'Product']} /> */}
             <Skeleton isLoaded={!looks.get.loading}>
-              <Text fontSize='3xl' marginTop="1" textTransform={'capitalize'}>
+              <Text fontSize="3xl" marginTop="1" textTransform={"capitalize"}>
                 <Link
                   textDecoration="none"
                   _hover={{ textDecoration: "none" }}
@@ -211,17 +210,18 @@ export const renderLooks = ({ looks, orangeColorMode, getLooks }) => {
                   {look.name}
                 </Link>
               </Text>
-              
+
               <LooksCreatedDate date={look.createdAt} />
             </Skeleton>
             {renderLookPoints({ look })}
             <Stack direction="row" spacing={4} marginTop="5">
               <Link to={`looks/${look.objectId}`}>
                 <Button
-                  colorScheme="blue"
+                  bgGradient="linear(to-bl, #594bab,#4d2c58)"
                   isFullWidth
                   leftIcon={<IoCaretForwardOutline />}
                   variant="solid"
+                  color="white"
                 >
                   View / Modify
                 </Button>
@@ -234,11 +234,11 @@ export const renderLooks = ({ looks, orangeColorMode, getLooks }) => {
     ));
   } else if (!looks.get.success.data.length) {
     return (
-      <Box>
-        <Flex direction="column" align="center">
+      <Box height="full">
+        <Flex direction="column" align="center" px="10">
           <VStack spacing="3">
-            <Heading as="h1" size="md">
-              You have not created any looks yet
+            <Heading as="h1" size="md" pt="10">
+              You have not created any HPAY shopping list yet.
             </Heading>
           </VStack>
           <br />
@@ -246,7 +246,7 @@ export const renderLooks = ({ looks, orangeColorMode, getLooks }) => {
           <br />
           <VStack spacing="3">
             <Link to="/looks/create">
-              <Button>Create Look</Button>
+              <Button>Create New Curation</Button>
             </Link>
           </VStack>
         </Flex>
@@ -414,14 +414,13 @@ function Looks(props) {
       }
     };
     return (
-      <Alert status="info" boxShadow='md'>
+      <Alert status="info" boxShadow="md">
         <Flex
           direction="row"
           justifyContent="space-between"
           width="100%"
           alignItems="center"
           height="100%"
-          
         >
           <Stack>{renderScriptStatusText()}</Stack>
           <ButtonGroup variant="outline" spacing="6">
@@ -517,12 +516,11 @@ function Looks(props) {
   };
 
   return (
-    <>
-    
+    <Box height="full">
       {renderWidgetStatusAlert({ looks })}
       <Divider />
       {renderChargesStatusAlert()}
-      <Container maxW={"3xl"}>
+      <Container maxW={"3xl"} height="full">
         {renderLooks({ looks, orangeColorMode, getLooks })}
       </Container>
       <AlertDialog onClose={onClose} isOpen={isOpen} isCentered size="3xl">
@@ -560,7 +558,7 @@ function Looks(props) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </Box>
   );
 }
 

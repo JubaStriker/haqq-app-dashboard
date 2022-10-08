@@ -52,7 +52,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { IoClose, IoAddOutline, IoCloseCircleOutline } from "react-icons/io5";
 import { ResourcePicker } from "@shopify/app-bridge-react";
 import NavBar from "../../components/navbar";
-
+import Blur from "../../components/blur";
 import useFilesStore from "../../store/files";
 import useScriptsStore from "../../store/scripts";
 
@@ -324,7 +324,7 @@ function CreateLooks(props) {
                 lineHeight={1.1}
                 fontSize={{ base: "2xl", sm: "3xl", md: "4xl" }}
               >
-                {data && data.name ? data.name : "Create a look"}
+                {data && data.name ? data.name : "Create a HPay shoppable look"}
               </Heading>
               <Text
                 color={"gray.500"}
@@ -382,7 +382,7 @@ function CreateLooks(props) {
                   <FormControl id="look-name">
                     <FormLabel>Look name</FormLabel>
                     <Input
-                      placeholder="Winter Fashion Look"
+                      placeholder="Give your list a name"
                       name="look_name"
                       type="text"
                       value={looksName}
@@ -409,7 +409,7 @@ function CreateLooks(props) {
                             height: "full",
                             rounded: "full",
                             transform: "scale(1.125)",
-                            bgGradient: "linear(to-bl, red.400,pink.400)",
+                            bgGradient: "inear(to-bl, #594bab,#4d2c58)",
                             position: "absolute",
                             zIndex: -1,
                             top: 0,
@@ -433,8 +433,8 @@ function CreateLooks(props) {
                       <Avatar
                         onClick={onOpen}
                         size="lg"
-                        bg={"pink.400"}
-                        _hover={{ bg: "pink.300" }}
+                        bg={"#594bab"}
+                        _hover={{ bg: "#4d2c58" }}
                         cursor="pointer"
                         icon={<IoAddOutline size="2em" color="white" />}
                         _before={{
@@ -443,7 +443,7 @@ function CreateLooks(props) {
                           height: "full",
                           rounded: "full",
                           transform: "scale(1.2)",
-                          bgGradient: "linear(to-bl, red.400,pink.400)",
+                          bgGradient: "linear(to-bl, #594bab,#4d2c58)",
                           position: "absolute",
                           zIndex: -1,
                           top: 0,
@@ -539,14 +539,14 @@ function CreateLooks(props) {
                     fontFamily={"heading"}
                     isFullWidth
                     w={"full"}
-                    bgGradient="linear(to-r, red.400,pink.400)"
+                    bgGradient="linear(to-bl, #594bab,#4d2c58)"
                     color={"white"}
                     _hover={{
-                      bgGradient: "linear(to-r, red.400,pink.400)",
+                      bgGradient: "linear(to-bl, #594bab,#4d2c58)",
                       boxShadow: "xl",
                     }}
                   >
-                    {`${id ? "Update" : "Save"} look`}
+                    {`${id ? "Update" : "Save"} this look`}
                   </Button>
                 </ButtonGroup>
               </chakra.form>
@@ -560,7 +560,7 @@ function CreateLooks(props) {
   return (
     <>
       <NavBar />
-      <Box position={"relative"} bg="#ccc">
+      <Box position={"relative"} bg="#222222">
         <Container
           as={SimpleGrid}
           maxW={"7xl"}
@@ -591,28 +591,6 @@ function CreateLooks(props) {
     </>
   );
 }
-
-export const Blur = (props) => {
-  return (
-    <Icon
-      width={useBreakpointValue({ base: "100%", md: "40vw", lg: "30vw" })}
-      zIndex={useBreakpointValue({ base: -1, md: -1, lg: 0 })}
-      height="560px"
-      viewBox="0 0 528 560"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
-      <circle cx="71" cy="61" r="111" fill="#F56565" />
-      <circle cx="244" cy="106" r="139" fill="#ED64A6" />
-      <circle cy="291" r="139" fill="#ED64A6" />
-      <circle cx="80.5" cy="189.5" r="101.5" fill="#ED8936" />
-      <circle cx="196.5" cy="317.5" r="101.5" fill="#ECC94B" />
-      <circle cx="70.5" cy="458.5" r="101.5" fill="#48BB78" />
-      <circle cx="426.5" cy="-0.5" r="101.5" fill="#4299E1" />
-    </Icon>
-  );
-};
 
 CreateLooks.defaultProps = {
   looks: {
