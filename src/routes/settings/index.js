@@ -20,6 +20,8 @@ import {
   FormErrorMessage,
   Spinner,
   SkeletonText,
+  HStack,
+  FormLabel,
 } from "@chakra-ui/react";
 import Blur from "../../components/blur";
 
@@ -46,14 +48,15 @@ const SettingsRoute = () => {
   const verifyWalletAddress = useWalletStore(
     (state) => state.verifyWalletAddress
   );
-
+console.log(hBarWalletAddress?.get?.success?.data)
   const onSubmitHandler = async (data) => {
-    const walletAddress = data;
+    console.log(data);
+    const { walletAddress, walletToken } = data;
     await verifyWalletAddress(walletAddress);
     console.log(verifyWalletSate.get.success.ok);
     if (verifyWalletSate.get.success.ok === true) {
       try {
-        await postWalletAddress({ shop, walletAddress });
+        await postWalletAddress({ shop, walletAddress, walletToken });
         toast({
           title: "Wallet address added successfully!",
           status: "success",
@@ -76,20 +79,20 @@ const SettingsRoute = () => {
   };
 
   const connectWallet = () => {
-    console.log("Hello World");
-    fetchWalletAddress();
-  };
+    window.open(process.env.REACT_APP_SERVER_URL + '/connect-wallet', '_blank', 'noopener,noreferrer')
+  }
 
   const walletSchema = Yup.object().shape({
     walletAddress: Yup.string().required("Wallet Address Is required"),
+    walletToken: Yup.string().required('Wallet USDCH Token to recieve HBAR'),
   });
 
   const formik = useFormik({
-    initialValues: { walletAddress: "" },
+    initialValues: { walletAddress: "", walletToken: "" },
     validationSchema: walletSchema,
     onSubmit: (values) => {
       if (values) {
-        onSubmitHandler(values.walletAddress);
+        onSubmitHandler(values);
       }
     },
   });
@@ -103,6 +106,10 @@ const SettingsRoute = () => {
     formik.setFieldValue(
       "walletAddress",
       hBarWalletAddress?.get?.success?.data?.walletAddress || ""
+    );
+    formik.setFieldValue(
+      "walletToken",
+      hBarWalletAddress?.get?.success?.data?.walletToken || ""
     );
   }, [hBarWalletAddress?.get?.success?.data?.walletAddress]);
 
@@ -132,7 +139,7 @@ const SettingsRoute = () => {
       return (
         <Box>
           <Text size="xl" fontWeight="bold" pb="5px">
-            HBAR wallet address where to receive HBAR from customer
+            HBAR wallet address and Token ID where to receive HBAR from customer
           </Text>
           <FormControl
             onSubmit={formik.handleSubmit}
@@ -140,6 +147,7 @@ const SettingsRoute = () => {
               formik.touched.walletAddress && formik.errors.walletAddress
             }
           >
+            <FormLabel>HBAR Wallet ID</FormLabel>
             <Input
               id="walletAddress"
               name="walletAddress"
@@ -161,19 +169,57 @@ const SettingsRoute = () => {
             </FormHelperText>
           </FormControl>
 
-          {/* <Button onClick={() => {connectWallet()}} >Connect to HBAR Wallet</Button> */}
-
-          <Button
-            mt={4}
-            onClick={formik.handleSubmit}
-            isLoading={hBarWalletAddress.post.loading}
-            type="submit"
-            size="sm"
-            bgGradient="linear(to-bl, #594bab,#4d2c58)"
-            color="white"
+          <FormControl
+            onSubmit={formik.handleSubmit}
+            isInvalid={
+              formik.touched.walletToken && formik.errors.walletToken
+            }
           >
-            Save Address
-          </Button>
+            <FormLabel>USDC Token ID</FormLabel>
+            <Input
+              id="walletToken"
+              name="walletToken"
+              type="text"
+              placeholder="USDC Token ID"
+              onChange={formik.handleChange}
+              value={formik.values.walletToken}
+            />
+
+            <FormHelperText size="sm" color={"red"}>
+              {formik.touched.walletToken && formik.errors.walletToken ? (
+                formik.errors.walletToken
+              ) : (
+                <FormErrorMessage>
+                  Please check HBAR wallet address or Token ID where to receive HBAR from
+                  customer
+                </FormErrorMessage>
+              )}
+            </FormHelperText>
+          </FormControl>
+          
+
+          <HStack>
+            <Button
+              onClick={formik.handleSubmit}
+              isLoading={hBarWalletAddress.post.loading}
+              type="submit"
+              size="sm"
+              bgGradient="linear(to-bl, #594bab,#4d2c58)"
+              color="white"
+              _hover={{bgGradient: "linear(to-bl, #ada1ed,#8e55a1)"}}
+            >
+              Save Address
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => connectWallet()}
+              bgGradient="linear(to-bl, #594bab,#4d2c58)"
+              _hover={{bgGradient: "linear(to-bl, #ada1ed,#8e55a1)"}}
+              color="white"
+            >
+              Connect to HBAR Wallet
+            </Button>
+          </HStack>
         </Box>
       );
     }

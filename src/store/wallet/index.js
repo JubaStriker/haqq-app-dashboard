@@ -1,6 +1,8 @@
 import create from "zustand";
 import axios from "axios";
 import produce from "immer";
+import { HashConnect } from "hashconnect";
+import { PublicKey, TokenCreateTransaction } from "@hashgraph/sdk";
 
 const VERIFY_WALLET_STATE = {
   get: {
@@ -41,6 +43,8 @@ const INITIAL_WALLET_STATE = {
   },
 };
 
+let hashconnect = new HashConnect();
+
 const useWalletStore = create((set, address) => ({
   verifyWalletSate: VERIFY_WALLET_STATE,
   walletState: INITIAL_WALLET_STATE,
@@ -58,7 +62,6 @@ const useWalletStore = create((set, address) => ({
       }))
     );
     try {
-      // console.log(data);
       const fetchAccount = await fetch(
         `${process.env.REACT_APP_HEDERA_ACCOUNT_VERIFY}api/v1/accounts?account.id=${data}`
       );
@@ -98,106 +101,6 @@ const useWalletStore = create((set, address) => ({
           },
         }))
       );
-    }
-  },
-  fetchWalletAddress: async () => {
-    // set(
-    //   produce((state) => ({
-    //     ...state,
-    //     walletState: {
-    //       ...state.walletState,
-    //       get: {
-    //         ...INITIAL_WALLET_STATE.get,
-    //         loading: true,
-    //       },
-    //     },
-    //   }))
-    // );
-    try {
-      let hashConnect = new HashConnect();
-      window.parent.hashConnect = hashConnect;
-      console.log("Hash Connect Data", hashConnect);
-      const appMetadata = {
-        name: "HBar Shop",
-        description: "An example hedera dApp",
-        icon: "https://absolute.url/to/icon.png",
-        url: "https://9516-171-76-213-73.in.ngrok.io",
-      };
-
-      const initData = await window.parent.hashConnect.init(
-        appMetadata,
-        "testnet",
-        false
-      );
-
-      // console.log('asdasd')
-      // let qrcode = "";
-      // const ScanCode = await new AwesomeQR({
-      //   text: initData.pairingString,
-      //   size: 400,
-      //   margin: 16,
-      //   maskPattern: 110,
-      //   colorLight: "#fff",
-      // })
-      //   .draw()
-      //   .then((dataURL) => {
-      //     if (dataURL) {
-      //       qrcode = dataURL.toString();
-      //     }
-      //   });
-      // console.log(qrcode);
-      console.log("Here ", hashConnect);
-      window.parent.hashConnect.foundExtensionEvent.once(
-        (walletMetadata) => {
-          console.log("WALLET METADAT ", walletMetadata);
-          hashConnect.connectToLocalWallet(
-            initData.pairingString,
-            walletMetadata
-          );
-        },
-        (err) => console.error(err)
-      );
-      let walletAddress = "";
-      window.parent.hashConnect.pairingEvent.once((pairingData) => {
-        console.log("Paired Data: ", pairingData);
-        pairingData.accountIds.forEach((id) => {
-          walletAddress = id;
-          console.log(walletAddress);
-        });
-        //   // set(
-        //   //   produce((state) => ({
-        //   //     ...state,
-        //   //     walletState: {
-        //   //       ...state.walletState,
-        //   //       get: {
-        //   //         ...INITIAL_WALLET_STATE.get,
-        //   //         success: {
-        //   //           data: walletAddress,
-        //   //           ok: true,
-        //   //         },
-        //   //       },
-        //   //     },
-        //   //   }))
-        //   // );
-      });
-    } catch (e) {
-      console.error(e);
-      // set(
-      //   produce((state) => ({
-      //     ...state,
-      //     walletState: {
-      //       ...state.walletState,
-      //       get: {
-      //         ...INITIAL_WALLET_STATE.get,
-      //         loading: false,
-      //         success:{
-      //           data: e.message,
-      //           ok: false,
-      //         }
-      //       },
-      //     },
-      //   }))
-      // );
     }
   },
   getWalletAddress: async (shop) => {
@@ -254,7 +157,7 @@ const useWalletStore = create((set, address) => ({
       );
     }
   },
-  postWalletAddress: async ({ shop, walletAddress }) => {
+  postWalletAddress: async ({ shop, walletAddress, walletToken }) => {
     set(
       produce((state) => ({
         ...state,
@@ -273,6 +176,7 @@ const useWalletStore = create((set, address) => ({
         {
           shop,
           walletAddress,
+          walletToken
         }
       );
       set(
@@ -313,6 +217,243 @@ const useWalletStore = create((set, address) => ({
         }))
       );
       throw error;
+    }
+  },
+  getHABRWalletConnect: async () => {
+    set(
+      produce((state) => ({
+        ...state,
+        walletState: {
+          ...state.walletState,
+          get: {
+            ...INITIAL_WALLET_STATE.get,
+            loading: true,
+          },
+        },
+      }))
+    );
+    try {
+      const appMetaData = {
+        name: "Hbar Shopify App",
+        description: "Hedera Token Creation",
+        icon: "https://cdn-icons-png.flaticon.com/512/5987/5987861.png",
+      };
+
+      const initData = await hashconnect.init(appMetaData, "testnet", false);
+
+      hashconnect.foundExtensionEvent.once((walletMetadata) => {
+        hashconnect.connectToLocalWallet(
+          initData.pairingString,
+          walletMetadata
+        );
+      });
+      let walletAccountID = "";
+      hashconnect.pairingEvent.once((pairingData) => {
+        console.log(pairingData);
+        pairingData.accountIds.forEach((id) => {
+          walletAccountID = id;
+        });
+        console.log("wallet ID: ", walletAccountID);
+        set(
+          produce((state) => ({
+            ...state,
+            walletState: {
+              ...state.walletState,
+              get: {
+                ...INITIAL_WALLET_STATE.get,
+                loading: false,
+                success: {
+                  data: {
+                    topic: pairingData.topic,
+                    accountId: walletAccountID,
+                    network: pairingData.network,
+                  },
+                  ok: true,
+                },
+              },
+            },
+          }))
+        );
+      });
+    } catch (e) {
+      set(
+        produce((state) => ({
+          ...state,
+          walletState: {
+            ...state.walletState,
+            get: {
+              ...INITIAL_WALLET_STATE.get,
+              loading: false,
+              success: {
+                ok: false,
+              },
+              failure: {
+                error: false,
+                message: "Please check your Hashpack Wallet",
+              },
+            },
+          },
+        }))
+      );
+    }
+  },
+  createUSDHToken: async ({ accountId, network, topic }) => {
+    set(
+      produce((state) => ({
+        ...state,
+        walletState: {
+          ...state.walletState,
+          get: {
+            ...INITIAL_WALLET_STATE.get,
+            loading: true,
+          },
+        },
+      }))
+    );
+    try {
+      console.log(accountId, network, topic);
+      const provider = hashconnect.getProvider(network, topic, accountId);
+      const signer = hashconnect.getSigner(provider);
+
+      let accountInfo = await fetch(
+        "https://testnet.mirrornode.hedera.com/api/v1/accounts/" + accountId,
+        { method: "GET" }
+      );
+      let account = await accountInfo.json();
+
+      let key = PublicKey.fromString(account.key.key);
+      console.log(key);
+
+      const createTokenTx = await new TokenCreateTransaction()
+        .setTokenName("USDC Hedera")
+        .setTokenSymbol("USDCH")
+        .setDecimals(0)
+        .setInitialSupply(100)
+        .setTreasuryAccountId(accountId)
+        .setAdminKey(key)
+        .setSupplyKey(key)
+        .setWipeKey(key)
+        .setAutoRenewAccountId(accountId)
+        .freezeWithSigner(signer);
+
+      const createReceipt = await createTokenTx.executeWithSigner(signer);
+      console.log("Created Receipt: ", createReceipt);
+
+      let txId = createReceipt.transactionId;
+      let respId = txId.replace(/[^\d+]/g, "-");
+      let respid = respId.replace("-", ".");
+      let transId = respid.replace("-", ".");
+
+      console.log("Transaction Id: ", transId);
+
+      set(
+        produce((state) => ({
+          ...state,
+          walletState: {
+            ...state.walletState,
+            get: {
+              ...INITIAL_WALLET_STATE.get,
+              success: {
+                ok: true,
+                data: {
+                  network,
+                  accountId,
+                  topic,
+                  transId,
+                },
+              },
+            },
+          },
+        }))
+      );
+    } catch (error) {
+      set(
+        produce((state) => ({
+          ...state,
+          walletState: {
+            ...state.walletState,
+            get: {
+              ...INITIAL_WALLET_STATE.get,
+              failure: {
+                error: true,
+                message: error.message,
+              },
+            },
+          },
+        }))
+      );
+    }
+  },
+  getHbarTokenId: async ({
+    accountId,
+    transId,
+    shop = "jithu-demo.myshopify.com",
+  }) => {
+    set(
+      produce((state) => ({
+        ...state,
+        walletState: {
+          ...state.walletState,
+          get: {
+            ...INITIAL_WALLET_STATE.get,
+            loading: true,
+          },
+        },
+      }))
+    );
+    try {
+      console.log(accountId, transId);
+      const transactionResponse = await fetch(
+        "https://testnet.mirrornode.hedera.com/api/v1/transactions/" + transId
+      );
+
+      const resp = await transactionResponse.json();
+      console.log("Transaction Response: ", resp);
+      const generatedId = resp.transactions[0].entity_id;
+      console.log("Token ID: ", generatedId);
+
+      const { data } = await axios.post(
+        `${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/put_shop`,
+        {
+          shop,
+          walletAddress: accountId,
+          walletToken: generatedId,
+        }
+      );
+
+      set(
+        produce((state) => ({
+          ...state,
+          walletState: {
+            ...state.INITIAL_WALLET_STATE,
+            get:{
+              ok: true,
+              data: {
+                data,
+                accountId,
+                generatedId,
+              }
+            }
+          }
+        }))
+      )
+
+    } catch (error) {
+      set(
+        produce((state) => ({
+          ...state,
+          walletState: {
+            ...state.walletState,
+            get: {
+              ...INITIAL_WALLET_STATE.get,
+              failure: {
+                error: true,
+                message: error.message,
+              },
+            },
+          },
+        }))
+      );
     }
   },
 }));

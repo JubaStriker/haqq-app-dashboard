@@ -12,6 +12,7 @@ import EmbedRoute from './embed';
 // You should always import these components even without using else app back navigation will break
 import { ClientRouter, useClientRouting, useRoutePropagation, RoutePropagator } from '@shopify/app-bridge-react';
 import TransactionRoute from './transaction';
+import ConnectWallet from './connect-wallet';
 const AppRoutes = (props) => {
 
 
@@ -38,6 +39,7 @@ const AppRoutes = (props) => {
 			<Route path="/shopify/callback" element={<App />} />
 			<Route path="/authorize" element={<Authorize />} />
 			<Route path="/" element={<App />} />
+			<Route path="/connect-wallet" element={<ConnectWallet />} />
 		</Routes>
 		</>
 	)
