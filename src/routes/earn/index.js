@@ -1,7 +1,7 @@
 import { Avatar, Box, Button, Center, Container, Flex, Heading, Icon, Stack, Text, WrapItem, useColorModeValue } from '@chakra-ui/react';
 import React from 'react';
 import NavBar from "../../components/navbar";
-import { Player } from '@lottiefiles/react-lottie-player';
+
 import {
     Table,
     Tbody,
@@ -29,35 +29,17 @@ const Earn = () => {
                     </Flex>
                 </Center>
 
-                <Flex justifyContent='space-around' alignItems='center' mt='20px'>
-                    <Box  >
+                <Center mt='40px'>
 
-
-                        <Center>
-                            <Text
-                                as={'span'} color='orange.400' fontWeight='bold' fontSize='42px'
-                            >
-                                Congrats,
-                            </Text>
-                        </Center>
-                        <br />
-                        <Text align='center' maxWidth='27rem' fontSize='26px'>
-                            Your customers are shopping with HBar and USDC on your e-commerce site.
-                        </Text>
-
-                    </Box>
-                    <Box >
-                        <Player
-                            src='https://assets9.lottiefiles.com/packages/lf20_NqMSzX9vqa.json'
-                            className="player"
-                            loop
-                            autoplay
-                            style={{ height: '450px', width: '450px' }}
-                            speed={4}
-                        />
-                    </Box>
-                </Flex>
-
+                    <Text
+                        as={'span'} color='orange.400' fontWeight='bold' fontSize='28px'
+                    >
+                        Congrats,
+                    </Text>
+                    <Text fontSize='26px'>
+                        Your customers are shopping with HBar and USDC on your e-commerce site.
+                    </Text>
+                </Center>
                 <Container maxW={'3xl'}>
                     <Stack
                         as={Box}
