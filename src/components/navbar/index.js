@@ -314,4 +314,8 @@ const NAV_ITEMS = [
     label: "HBAR Payments",
     href: "/transaction",
   },
+  {
+    label: "Earn",
+    href: '/earn'
+  }
 ];
