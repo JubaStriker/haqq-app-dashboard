@@ -14,6 +14,8 @@ import { ClientRouter, useClientRouting, useRoutePropagation, RoutePropagator } 
 import TransactionRoute from './transaction';
 import ConnectWallet from './connect-wallet';
 import Earn from './earn';
+import EmbedInstructions from './embed-insturctions';
+
 const AppRoutes = (props) => {
 
 
@@ -42,6 +44,7 @@ const AppRoutes = (props) => {
 				<Route path="/" element={<App />} />
 				<Route path="/connect-wallet" element={<ConnectWallet />} />
 				<Route path="/earn" element={<Earn />} />
+				<Route path="/embed-instructions" element={<EmbedInstructions />} />
 			</Routes>
 		</>
 	)
