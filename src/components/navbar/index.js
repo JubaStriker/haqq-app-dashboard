@@ -303,7 +303,7 @@ const NAV_ITEMS = [
   //   href: '/looks',
   // },
   {
-    label: "New HPay shop",
+    label: "New Curation",
     href: "/looks/create",
   },
   {
@@ -311,7 +311,7 @@ const NAV_ITEMS = [
     href: "/settings",
   },
   {
-    label: "HBAR Payments",
+    label: "Transactions & Payments",
     href: "/transaction",
   },
 

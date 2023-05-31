@@ -296,7 +296,7 @@ console.log(hBarWalletAddress?.get?.success?.data)
                 Widget Embed Settings
               </Text>
               <Text mt="4" fontSize="sm">
-                Enable or disable "HBAR Coupon" widget on your store. The widget
+                Enable or disable the Hedera Shop widget on your store. The widget
                 gets appended to the bottom of your store page above the footer
                 on the home page.
               </Text>

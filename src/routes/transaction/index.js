@@ -14,13 +14,18 @@ import {
   Divider,
   useColorMode,
   Link,
+  AlertIcon,
   SkeletonCircle,
   SkeletonText,
+  Alert,
+  AlertTitle,
+  AlertDescription,
 } from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
 import NavBar from "../../components/navbar";
 import { ShopContext } from "../../context";
 import useTransactionStore from "../../store/transaction";
+import { Link as ReactRouteLink } from "react-router-dom";
 
 const TransactionRoute = () => {
   const shop = useContext(ShopContext);
@@ -37,27 +42,8 @@ const TransactionRoute = () => {
 
   if (transactionState.get.success.data.length === 0) {
     return (
-     
       <>
-      <NavBar />
-       <Container
-      maxW={"7xl"}
-      p={[12, 6]}
-      minH={"100vh"}
-      bg="#f6f6f7"
-      textAlign={"left"}
-    >
-      <Box padding="6" boxShadow="lg" bg="white">
-        <SkeletonCircle size="10" />
-        <SkeletonText mt="4" noOfLines={4} spacing="4" />
-      </Box>
-      </Container>
-      </>
-    );
-  } else {
-    return (
-      <>
-      <NavBar />
+        <NavBar />
         <Container
           maxW={"7xl"}
           p={[12, 6]}
@@ -65,6 +51,38 @@ const TransactionRoute = () => {
           bg="#f6f6f7"
           textAlign={"left"}
         >
+          <Box padding="6" boxShadow="lg" bg="white">
+            <SkeletonCircle size="10" />
+            <SkeletonText mt="4" noOfLines={4} spacing="4" />
+          </Box>
+        </Container>
+      </>
+    );
+  } else {
+    return (
+      <>
+        <NavBar />
+        <Container
+          maxW={"7xl"}
+          p={[12, 6]}
+          minH={"100vh"}
+          bg="#f6f6f7"
+          textAlign={"left"}
+        >
+          <Alert status="info" mb="5">
+            <AlertIcon />
+            <Box>
+              <AlertTitle>Now earn with your crypto!</AlertTitle>
+              <AlertDescription>
+                <ReactRouteLink to="/earn">
+                  <Text decoration="underline" color="blue">
+                    Lend or stake your crypto today to earn interest.
+                  </Text>
+                </ReactRouteLink>
+              </AlertDescription>
+            </Box>
+          </Alert>
+
           <Box bg="white" width={"5xl"} m="auto" p={5} borderRadius="10px">
             <VStack spacing={2} align="stretch">
               <Box>
@@ -90,12 +108,10 @@ const TransactionRoute = () => {
                   {transactionState.get.success.data.transactions.map(
                     (details) => (
                       <Tr>
-                        <Td>
-                          {
-                             details.transfers.slice(-1).pop().account
-                          }
-                          </Td>
-                        <Td isNumeric>{details.transfers.slice(-1).pop().amount}</Td>
+                        <Td>{details.transfers.slice(-1).pop().account}</Td>
+                        <Td isNumeric>
+                          {details.transfers.slice(-1).pop().amount}
+                        </Td>
                         <Td>{details.charged_tx_fee}</Td>
                         <Td>{details.result}</Td>
                         <Td>

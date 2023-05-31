@@ -308,7 +308,7 @@ const EmbedRoute = (props) => {
                     }
                     isFullWidth
                   >
-                    HBAR Coupon
+                    Hedera Shop
                   </Button>
                 </Stack>
               </Box>
@@ -322,7 +322,7 @@ const EmbedRoute = (props) => {
   return (
     <Container maxW={"7xl"} p="12">
       <Center>
-        <Heading>HBAR Coupon</Heading>
+        <Heading>Hedera Shop</Heading>
       </Center>
       <br />
       <SimpleGrid minChildWidth="330px" spacing="10px">
