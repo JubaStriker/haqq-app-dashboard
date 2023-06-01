@@ -157,7 +157,7 @@ const DesktopNav = () => {
       ))}
       <Image
         height="32px"
-        src="https://o.remove.bg/downloads/d46e4ee3-5432-4f0a-bde4-d217291cb435/spaces_-LsUmP_7NoX2exvbv_Ps_uploads_git-blob-33736a5e848e8c14e8200155f45c56f8cd64846a_Built_On_Hedera___BLACK-removebg-preview.png"
+        src="https://powertransition.energy/sites/default/files/styles/partnersnode/public/partners/hedera-hashgraph.png?itok=HB8PEQ3K"
       />
     </Stack>
   );
@@ -317,11 +317,10 @@ const NAV_ITEMS = [
 
   {
     label: "Earn",
-    href: '/earn'
+    href: "/earn",
   },
   {
     label: "Embed",
-    href: '/embed-instructions'
+    href: "/embed-instructions",
   },
-
 ];
