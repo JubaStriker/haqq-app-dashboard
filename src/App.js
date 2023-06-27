@@ -7,6 +7,17 @@ import { parseQuery } from "./utils/url";
 import Authorize from "./routes/shopify/Authorize";
 import Parse from "parse";
 function App() {
+
+  //-------------- Setting the Blockchain network -----------//
+
+  const blockChainNetwork = { blockChain: "hedera" }
+  localStorage.setItem('blockchain', JSON.stringify(blockChainNetwork));
+
+  //-------------- Default Blockchain network is set to HEDERA -----------//
+
+
+
+
   const [shopifySessionAvailable, setShopifySessionAvailable] = useState(false);
   const [shopifyHmacAvailable, setShopifyHmacAvailable] = useState(false);
   const [shopifyCodeAvailable, setShopifyCodeAvailable] = useState(false);

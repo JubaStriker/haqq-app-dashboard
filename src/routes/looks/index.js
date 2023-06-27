@@ -177,7 +177,7 @@ export const renderLooks = ({ looks, orangeColorMode, getLooks }) => {
       </Box>
     );
   } else if (looks.get.success.data.length) {
-    return looks.get.success.data.map((look) => (
+    return looks.get?.success?.data?.map((look) => (
       <Box key={look.objectId}>
         <Box
           marginTop={{ base: "1", sm: "5" }}
@@ -290,7 +290,7 @@ function Looks(props) {
       } else {
         postViews({ shop, subscribed: false });
       }
-    } catch (e) {}
+    } catch (e) { }
   };
   useEffect(async () => {
     getLooks();
@@ -497,7 +497,7 @@ function Looks(props) {
             <Stack>
               <Text>
                 The Hedera Shop widget on your store has{" "}
-                <b>{chargesState.get.success.data.views.count}</b> views{" "}
+                <b>{chargesState?.get?.success?.data?.views?.count}</b> views{" "}
               </Text>
               <Text>
                 The first 1000 views are free. Please subscribe to our flat
