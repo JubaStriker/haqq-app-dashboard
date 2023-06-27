@@ -30,6 +30,8 @@ function App() {
   //     console.log('Can not detect incognito')
   // }
 
+  window.cryptoEnv = "hedera";
+
   const [isEmbed, setIsEmbed] = useState(false);
   useEffect(() => {
     const {
