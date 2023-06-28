@@ -23,6 +23,7 @@
     "immer": "^9.0.7",
     "js-cookie": "^3.0.1",
     "luxon": "^2.3.0",
+    "multicoin-address-validator": "^0.5.12",
     "netlify-cli": "^9.6.4",
     "parse": "^3.4.1",
     "react": "^17.0.2",
@@ -33,6 +34,7 @@
     "react-scripts": "4.0.3",
     "react-slick": "^0.28.1",
     "web-vitals": "^1.1.2",
+    "xrpl": "^2.8.1",
     "yup": "^0.32.11",
     "zustand": "^3.6.8"
   },

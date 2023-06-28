@@ -28,6 +28,12 @@ import useTransactionStore from "../../store/transaction";
 import { Link as ReactRouteLink } from "react-router-dom";
 
 const TransactionRoute = () => {
+
+  let blockChain;
+  const retrievedObject = localStorage.getItem('blockchain');
+  const blockChainObj = JSON.parse(retrievedObject);
+  blockChain = blockChainObj?.blockChain;
+
   const shop = useContext(ShopContext);
   const transactionState = useTransactionStore(
     (state) => state.transactionState
@@ -87,7 +93,9 @@ const TransactionRoute = () => {
             <VStack spacing={2} align="stretch">
               <Box>
                 <Text size="xl" fontWeight="bold">
-                  HABR Transaction Details
+                  {blockChain === "hedera" ? "HABR Transaction Details" : ""}
+                  {blockChain === "ripple" ? "XRP Transaction Details" : ""}
+
                 </Text>
                 <Divider borderColor="gray.200" />
               </Box>
@@ -104,29 +112,56 @@ const TransactionRoute = () => {
                     <Th>Transaction Ref</Th>
                   </Tr>
                 </Thead>
-                <Tbody>
-                  {transactionState.get.success.data.transactions.map(
-                    (details) => (
-                      <Tr>
-                        <Td>{details.transfers.slice(-1).pop().account}</Td>
-                        <Td isNumeric>
-                          {details.transfers.slice(-1).pop().amount}
-                        </Td>
-                        <Td>{details.charged_tx_fee}</Td>
-                        <Td>{details.result}</Td>
-                        <Td>
-                          <Link
-                            color="teal"
-                            target="_blank"
-                            href={`${process.env.REACT_APP_HBAR_TRANSACTION_REFFERENCE}transaction/${details.transaction_id}`}
-                          >
-                            {details.transaction_id}
-                          </Link>
-                        </Td>
-                      </Tr>
-                    )
-                  )}
-                </Tbody>
+                {blockChain === "hedera" ?
+                  <Tbody>
+                    {transactionState?.get?.success?.data?.transactions?.map(
+                      (details) => (
+                        <Tr>
+                          <Td>{details.transfers.slice(-1).pop().account}</Td>
+                          <Td isNumeric>
+                            {details.transfers.slice(-1).pop().amount}
+                          </Td>
+                          <Td>{details.charged_tx_fee}</Td>
+                          <Td>{details.result}</Td>
+                          <Td>
+                            <Link
+                              color="teal"
+                              target="_blank"
+                              href={`${process.env.REACT_APP_HBAR_TRANSACTION_REFFERENCE}transaction/${details.transaction_id}`}
+                            >
+                              {details.transaction_id}
+                            </Link>
+                          </Td>
+                        </Tr>
+                      )
+                    )}
+                  </Tbody> :
+                  ""}
+                {blockChain === "ripple" ?
+                  <Tbody>
+                    {transactionState.get.success.data?.result?.transactions?.map(
+                      (details) => (
+                        // <Text>{details.tx.Account}</Text>
+                        <Tr>
+                          <Td>{details.tx.Account}</Td>
+                          <Td isNumeric>
+                            {window.xrpl.dropsToXrp(details.tx.Amount)}
+                          </Td>
+                          <Td>{details.tx.inLedger}</Td>
+                          <Td>{details.tx.Fee}</Td>
+                          <Td>
+                            <Link
+                              color="teal"
+                              target="_blank"
+                              href={`${process.env.REACT_APP_XRP_TRANSACTION_REFFERENCE}transactions/${details.tx.hash}`}
+                            >
+                              {details.tx.hash}
+                            </Link>
+                          </Td>
+                        </Tr>
+                      )
+                    )}
+                  </Tbody> : ""}
               </Table>
             </TableContainer>
           </Box>
