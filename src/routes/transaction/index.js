@@ -106,7 +106,7 @@ const TransactionRoute = () => {
                 <Thead>
                   <Tr>
                     <Th>Account</Th>
-                    <Th isNumeric>Amount</Th>
+                    {/* <Th isNumeric>Amount</Th> */}
                     <Th>Fee</Th>
                     <Th>Result</Th>
                     <Th>Transaction Ref</Th>
@@ -144,9 +144,11 @@ const TransactionRoute = () => {
                         // <Text>{details.tx.Account}</Text>
                         <Tr>
                           <Td>{details.tx.Account}</Td>
-                          <Td isNumeric>
+
+                          {/* ---------- There is no Amount field  in tx*/}
+                          {/* <Td isNumeric>
                             {window.xrpl.dropsToXrp(details.tx.Amount)}
-                          </Td>
+                          </Td> */}
                           <Td>{details.tx.inLedger}</Td>
                           <Td>{details.tx.Fee}</Td>
                           <Td>

@@ -2,6 +2,7 @@ import create from "zustand";
 import axios from "axios";
 import produce from "immer";
 import { INTERNAL_SERVER_ERROR } from "../../constants/strings";
+import { Client } from "xrpl";
 
 let blockChain;
 const retrievedObject = localStorage.getItem('blockchain');
@@ -63,7 +64,7 @@ const useTransactionStore = create((set) => ({
       }
       // ----------------------- Ripple --------------------- //
       else if (blockChain === 'ripple') {
-        const client = new window.xrpl.Client(
+        const client = new Client(
           `${process.env.REACT_APP_XRP_TRANSACTION_FETCH_UTL}`
         );
         await client.connect();
