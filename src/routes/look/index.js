@@ -62,6 +62,11 @@ import { INTERNAL_SERVER_ERROR } from "../../constants/strings";
 import { ShopContext } from "../../context";
 import useCurrencyExchangeStore from "../../store/currency-exchage";
 
+let blockChain;
+const retrievedObject = localStorage.getItem('blockchain');
+const blockChainObj = JSON.parse(retrievedObject);
+blockChain = blockChainObj?.blockChain;
+
 const renderSkeleton = () => {
   return (
     <Flex direction="column" width="100%">
@@ -111,6 +116,7 @@ function CreateLooks(props) {
   const [looksName, setLooksName] = useState(props.looks.name);
   const [looksPrice, setLooksPrice] = useState(props.looks.price);
   const [lookHbarPrice, setLookHbarPrice] = useState();
+  const [lookXrpPrice, setLookXrpPrice] = useState();
   const [uploads, setUploads] = useState(props.looks.files || []);
   const [products, setProducts] = useState(props.looks.products || []);
   const [exchangeRate, setExchageRate] = useState();
@@ -123,9 +129,16 @@ function CreateLooks(props) {
 
   const getExchangeRate = (data) => {
     console.log(data);
-    setLookHbarPrice(
-      (currencyExchangeState.get.success.data * data).toFixed(2)
-    );
+    if (blockChain === 'hedera') {
+      setLookHbarPrice(
+        (currencyExchangeState.get.success.data * data).toFixed(2)
+      );
+    }
+    else if (blockChain === 'ripple') {
+      setLookXrpPrice(
+        (currencyExchangeState.get.success.data.xrp * data).toFixed(2)
+      );
+    }
   };
 
   const onResourcePickerDone = (data = {}) => {
@@ -324,12 +337,19 @@ function CreateLooks(props) {
                 lineHeight={1.1}
                 fontSize={{ base: "2xl", sm: "3xl", md: "4xl" }}
               >
-                {data && data.name ? data.name : "Create a HPay shoppable look"}
+                {data && data.name ? data.name : "Create a shoppable curation"}
               </Heading>
-              <Text
-                color={"gray.500"}
-                fontSize={{ base: "sm", sm: "md" }}
-              ></Text>
+              {blockChain === 'hedera' ?
+                <Heading size="sm">
+                  Items in this curation can be bought by paying with HBAR
+                </Heading>
+                : ""}
+              {blockChain === 'ripple' ?
+                <Heading size="sm">
+                  Items in this curation can be bought by paying with XRP
+                </Heading>
+                : ""}
+
             </Stack>
             <Box mt={10}>
               <chakra.form
@@ -364,9 +384,8 @@ function CreateLooks(props) {
                       }
                     }
                     toast({
-                      title: `Looks ${
-                        id ? "updated" : "created"
-                      } successfully!`,
+                      title: `Looks ${id ? "updated" : "created"
+                        } successfully!`,
                       status: "success",
                     });
                   } catch (e) {
@@ -495,18 +514,44 @@ function CreateLooks(props) {
                         onBlur={(e) => getExchangeRate(e.target.value)}
                         required
                       />
-                      <InputRightAddon w={"50%"}>
-                        {currencyExchangeState.get.loading ? (
-                          <Spinner />
-                        ) : (
-                          `${lookHbarPrice ? lookHbarPrice : "0"} HBAR`
-                        )}
-                      </InputRightAddon>
+                      {/* ------------- Hedera ------------------ */}
+                      {blockChain === 'hedera' ?
+                        <InputRightAddon w={"50%"}>
+                          {currencyExchangeState.get.loading ? (
+                            <Spinner />
+                          ) : (
+                            `${lookHbarPrice ? lookHbarPrice : "0"} HBAR`
+                          )}
+                        </InputRightAddon>
+                        : ""}
+
+                      {blockChain === 'ripple' ?
+                        <InputRightAddon w={"50%"}>
+                          {currencyExchangeState.get.loading ? (
+                            <Spinner />
+                          ) : (
+                            `${lookXrpPrice ? lookXrpPrice : "0"} XRP`
+                          )}
+                        </InputRightAddon>
+                        : ""}
+
+
                     </InputGroup>
-                    <FormHelperText>
-                      The total number of HBAR user has to pay to shop all of
-                      the above products in this look
-                    </FormHelperText>
+                    {blockChain === 'hedera' ?
+                      <FormHelperText>
+                        The total number of HBAR user has to pay to shop all of
+                        the above products in this look
+                      </FormHelperText>
+                      : ''}
+
+                    {blockChain === 'ripple' ?
+                      <FormHelperText>
+                        The total number of XRP a customer has to pay to shop all
+                        of the above products in this curation. Please add a
+                        discounted price to encourage community.
+                      </FormHelperText>
+                      : ""}
+
                   </FormControl>
                 </Stack>
                 <ButtonGroup mt={8} width="full">
