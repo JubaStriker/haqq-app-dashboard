@@ -3,17 +3,22 @@ import produce from 'immer';
 import axios from 'axios';
 import { INTERNAL_SERVER_ERROR } from '../../constants/strings';
 
+let blockChain;
+const retrievedObject = localStorage.getItem('blockchain');
+const blockChainObj = JSON.parse(retrievedObject);
+blockChain = blockChainObj?.blockChain;
+
 const INITIAL_CURRENCY_EXCHANGE_SATAE = {
-    get:{
+    get: {
         loading: false,
-    success: {
-      ok: false,
-      data: [],
-    },
-    failure: {
-      error: false,
-      message: "",
-    },
+        success: {
+            ok: false,
+            data: [],
+        },
+        failure: {
+            error: false,
+            message: "",
+        },
     }
 }
 
@@ -33,26 +38,49 @@ const useCurrencyExchangeStore = create((set) => ({
             }))
         )
 
-        try{ 
-            const response = await axios.get('https://api.coinconvert.net/convert/usd/hbar?amount=1');
-            console.log(response);
-            set(
-                produce((state) => ({
-                    ...state,
-                    currencyExchangeState: {
-                        ...state.currencyExchangeState,
-                        get: {
-                            ...INITIAL_CURRENCY_EXCHANGE_SATAE.get,
-                            success: {
-                                ok: true,
-                                data: response.data.HBAR,
+        try {
+            let response;
+
+            if (blockChain === 'hedera') {
+                response = await axios.get('https://api.coinconvert.net/convert/usd/hbar?amount=1');
+                console.log(response);
+                set(
+                    produce((state) => ({
+                        ...state,
+                        currencyExchangeState: {
+                            ...state.currencyExchangeState,
+                            get: {
+                                ...INITIAL_CURRENCY_EXCHANGE_SATAE.get,
+                                success: {
+                                    ok: true,
+                                    data: response.data.HBAR,
+                                }
                             }
                         }
-                    }
-                }))
-            )
+                    }))
+                )
+            }
+            else if (blockChain === 'ripple') {
+                const response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=usd&vs_currencies=xrp')
+                // console.log(response);
+                set(
+                    produce((state) => ({
+                        ...state,
+                        currencyExchangeState: {
+                            ...state.currencyExchangeState,
+                            get: {
+                                ...INITIAL_CURRENCY_EXCHANGE_SATAE.get,
+                                success: {
+                                    ok: true,
+                                    data: response.data.usd,
+                                }
+                            }
+                        }
+                    }))
+                )
+            }
             return response;
-        } catch (e){
+        } catch (e) {
             console.log(e);
         }
     }
