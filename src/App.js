@@ -10,7 +10,7 @@ function App() {
 
   //-------------- Setting the Blockchain network -----------//
 
-  const blockChainNetwork = { blockChain: "hedera" }
+  const blockChainNetwork = { blockChain: "ripple" }
   localStorage.setItem('blockchain', JSON.stringify(blockChainNetwork));
 
   //-------------- Default Blockchain network is set to HEDERA -----------//

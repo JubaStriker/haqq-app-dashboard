@@ -51,7 +51,7 @@ const useTransactionStore = create((set) => ({
     );
 
     try {
-      const { data } = await axios.get(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/get_shop?shop=${shop}`);
+      const { data } = await axios.get(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/get_shop?shop=${shop}&blockchain=${blockChain}`);
       const walletAddress = data.walletAddress;
 
       let response;
