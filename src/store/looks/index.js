@@ -4,6 +4,11 @@ import produce from "immer";
 import Parse from "parse";
 import { INTERNAL_SERVER_ERROR } from "../../constants/strings";
 
+let blockchain;
+const retrievedObject = localStorage.getItem('blockchain');
+const blockChainObj = JSON.parse(retrievedObject);
+blockchain = blockChainObj?.blockChain;
+
 const INITIAL_LOOKS_STATE = {
 	get: {
 		loading: false,
@@ -53,7 +58,7 @@ const INITIAL_LOOKS_STATE = {
 
 const useLooksStore = create((set, get) => ({
 	looks: INITIAL_LOOKS_STATE,
-	getLooks: async({ id = '', shop = window.lookbook.shop } = {}) => {
+	getLooks: async ({ id = '', shop = window.lookbook.shop } = {}) => {
 		set(produce(state => ({
 			...state,
 			looks: {
@@ -70,7 +75,7 @@ const useLooksStore = create((set, get) => ({
 			// Parse.Cloud.run('get_looks', {
 			// 	shop, id
 			// })
-		
+
 			const { data } = await axios.get(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/get_looks?shop=${shop}&id=${id}`);
 			set(produce(state => ({
 				...state,
@@ -86,11 +91,11 @@ const useLooksStore = create((set, get) => ({
 				}
 			})));
 			return data;
-			
+
 
 		} catch (e) {
 			console.error(e)
-			if (e.code ===  Parse.Error.INVALID_SESSION_TOKEN) {
+			if (e.code === Parse.Error.INVALID_SESSION_TOKEN) {
 				Parse.User.logOut();
 			}
 			set(produce(state => ({
@@ -108,7 +113,7 @@ const useLooksStore = create((set, get) => ({
 			})))
 		}
 	},
-	postLooks: async ({ id, shop = window.lookbook.shop, name, price, medias, products = [] }) => {
+	postLooks: async ({ id, shop = window.lookbook.shop, name, price, medias, products = [], lookHbarPrice, lookXrpPrice }) => {
 		set(produce(state => ({
 			...state,
 			looks: {
@@ -127,6 +132,9 @@ const useLooksStore = create((set, get) => ({
 				price,
 				medias,
 				products,
+				blockchain,
+				lookHbarPrice,
+				lookXrpPrice,
 			});
 			set(produce(state => ({
 				...state,
@@ -265,4 +273,4 @@ const useLooksStore = create((set, get) => ({
 }));
 
 export default useLooksStore;
-	
+

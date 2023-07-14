@@ -23,6 +23,11 @@ import {
 } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
 
+let blockchain;
+const retrievedObject = localStorage.getItem('blockchain');
+const blockChainObj = JSON.parse(retrievedObject);
+blockchain = blockChainObj?.blockChain;
+
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
 
@@ -115,6 +120,7 @@ const DesktopNav = () => {
   const linkHoverColor = useColorModeValue("gray.800", "white");
   const popoverContentBgColor = useColorModeValue("white", "gray.800");
 
+
   return (
     <Stack direction={"row"} spacing={4}>
       {NAV_ITEMS.map((navItem) => (
@@ -155,10 +161,21 @@ const DesktopNav = () => {
           </Popover>
         </Box>
       ))}
-      <Image
-        height="32px"
-        src="https://powertransition.energy/sites/default/files/styles/partnersnode/public/partners/hedera-hashgraph.png?itok=HB8PEQ3K"
-      />
+
+      {blockchain === 'hedera' ?
+        <Image
+          height="32px"
+          src="https://powertransition.energy/sites/default/files/styles/partnersnode/public/partners/hedera-hashgraph.png?itok=HB8PEQ3K"
+        /> : ""
+      }
+
+      {blockchain === 'ripple' ?
+        <Image
+          height="32px"
+          src="https://sweatcoinguide.com/wp-content/uploads/2017/12/ripple-xrp-logo.png" /> :
+        ""
+      }
+
     </Stack>
   );
 };
@@ -267,41 +284,7 @@ const MobileNavItem = ({ label, children, href }) => {
   );
 };
 
-const NAV_ITEMS = [
-  // {
-  //   label: 'Home',
-  //   children: [
-  //     {
-  //       label: 'Explore Design Work',
-  //       subLabel: 'Trending Design to inspire you',
-  //       href: '#',
-  //     },
-  //     {
-  //       label: 'New & Noteworthy',
-  //       subLabel: 'Up-and-coming Designers',
-  //       href: '#',
-  //     },
-  //   ],
-  // },
-  // {
-  //   label: 'Find Work',
-  //   children: [
-  //     {
-  //       label: 'Job Board',
-  //       subLabel: 'Find your dream design job',
-  //       href: '#',
-  //     },
-  //     {
-  //       label: 'Freelance Projects',
-  //       subLabel: 'An exclusive list for contract work',
-  //       href: '#',
-  //     },
-  //   ],
-  // },
-  // {
-  //   label: 'Looks',
-  //   href: '/looks',
-  // },
+let NAV_ITEMS = [
   {
     label: "New Curation",
     href: "/looks/create",
@@ -324,3 +307,58 @@ const NAV_ITEMS = [
     href: "/embed-instructions",
   },
 ];
+
+if (blockchain === "hedera") {
+  NAV_ITEMS = [
+    {
+      label: "New Curation",
+      href: "/looks/create",
+    },
+    {
+      label: "Settings",
+      href: "/settings",
+    },
+    {
+      label: "Transactions & Payments",
+      href: "/transaction",
+    },
+
+    {
+      label: "Earn",
+      href: "/earn",
+    },
+    {
+      label: "Embed",
+      href: "/embed-instructions",
+    },
+  ];
+}
+else if (blockchain === 'ripple') {
+  NAV_ITEMS = [
+    {
+      label: "New Curation",
+      href: "/looks/create",
+    },
+    {
+      label: "Settings",
+      href: "/settings",
+    },
+    {
+      label: "Transactions & Payments",
+      href: "/transaction",
+    },
+
+    // {
+    //   label: "Earn",
+    //   href: "/earn",
+    // },
+    {
+      label: "Embed",
+      href: "/embed-instructions",
+    },
+    {
+      label: "NFTs",
+      href: "/nft",
+    },
+  ];
+}

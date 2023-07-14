@@ -15,6 +15,7 @@ import TransactionRoute from './transaction';
 import ConnectWallet from './connect-wallet';
 import Earn from './earn';
 import EmbedInstructions from './embed-insturctions';
+import NFTRoute from './nft';
 
 const AppRoutes = (props) => {
 
@@ -45,6 +46,7 @@ const AppRoutes = (props) => {
 				<Route path="/connect-wallet" element={<ConnectWallet />} />
 				<Route path="/earn" element={<Earn />} />
 				<Route path="/embed-instructions" element={<EmbedInstructions />} />
+				<Route path="/nft" element={<NFTRoute />} />
 			</Routes>
 		</>
 	)

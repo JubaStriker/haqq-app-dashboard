@@ -370,6 +370,8 @@ function CreateLooks(props) {
                         price: looksPrice,
                         medias: uploads,
                         products: products.map((product) => product.id),
+                        lookHbarPrice,
+                        lookXrpPrice
                       });
                       try {
                         const scriptsOnStore = await getScripts(shop);
