@@ -1,12 +1,26 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import NavBar from "../../components/navbar";
 import useNFTStore from "../../store/nft";
-import { Box, Button, Center, Container, Flex, Heading, Image, Input, Stack, StackDivider, Text, useToast } from '@chakra-ui/react';
+import { Box, Button, Center, Container, Flex, Heading, Image, Input, SkeletonText, Stack, StackDivider, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useToast } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel, Textarea } from '@chakra-ui/react'
+import SendNftModal from '../../components/sendNftModal';
+import Loading from '../../components/loader';
 
 
 const NFTRoute = () => {
 
+    const [allOrders, setAllOrders] = useState([])
+    const shop = window.lookbook.shop
+
+    useEffect(() => {
+        fetch(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/get_orders?shop=${shop}`)
+            .then(res => res.json())
+            .then(data => setAllOrders(data));
+    }, [shop])
+
+    let orders = allOrders.filter(order => order.discount_codes.length >= 0)
+
+    console.log(orders, "ORDERS")
 
     const nftState = useNFTStore((state) => state.nftState);
     const postNFTState = useNFTStore((state) => state.postNFTState);
@@ -90,7 +104,7 @@ const NFTRoute = () => {
         createSellOffer(seed, tokenID, amount, flags, destination);
 
         form.reset();
-    };
+    }
 
 
 
@@ -255,7 +269,6 @@ const NFTRoute = () => {
 
                         <TabPanel>
                             <Box bg="white" maxW="5xl" mx="auto" borderRadius={10} p={5} mt={'24px'} boxShadow="md">
-                                {/* <Text mb='4px' align={"center"} mt={'8px'} size="xl" fontWeight="bold" >CREATE A SELL OFFER</Text> */}
 
                                 {nftState.post.success.ok ?
                                     <Box width={"100%"}>
@@ -279,59 +292,57 @@ const NFTRoute = () => {
                                         </Center>
 
                                     </Box> : ""}
-                                <form onSubmit={handleCrateSellOffer}>
 
-                                    {/* <Text mb='4px' mt={'8px'} size="xl" fontWeight="bold" >NFT TOKEN ID</Text>
-                                    <Input
-                                        name='tokenID'
-                                        placeholder='Type your NFToken ID'
-                                        size='sm'
-                                        required={true}
-                                        defaultValue={NFTokenID}
-                                        display={"hidden"}
 
-                                    />
-                                    
-                                    <Text mb='4px' mt={'8px'} size="xl" fontWeight="bold" >FLAGS</Text>
-                                    <Input
-                                        name='flags'
-                                        placeholder='Type number of flags'
-                                        size='sm'
-                                        required={true}
-                                        defaultValue={1}
-                                        disabled={true}
-                                    /> */}
+                                <Text mb='4px' align={"center"} mt={'8px'} size="xl" fontWeight="bold" >See all of your orders</Text>
 
-                                    {/* <Text mb='4px' mt={'8px'} size="xl" fontWeight="bold" >AMOUNT</Text>
-                                    <Input
-                                        name='amount'
-                                        placeholder='Enter an amount in drops (1000000 drops = 1 xrp)'
-                                        size='sm'
-                                        required={true}
-                                        defaultValue={0}
-                                    /> */}
 
-                                    {/* <Text mb='4px' mt={'8px'} size="xl" fontWeight="bold" >EXPIRATION</Text>
-                                    <Input
-                                        name='expiration'
-                                        placeholder='Type number of expiration days'
-                                        size='sm'
-                                        required={true}
-                                    /> */}
-                                    <Text mb='4px' mt={'8px'} size="xl" fontWeight="bold" >DESTINATION</Text>
-                                    <Input
-                                        name='destination'
-                                        placeholder='Type XRP account you wish to send NFT badge'
-                                        size='sm'
-                                        required={true}
-                                    />
 
-                                    <Button isLoading={nftState.offer.loading} type='submit' colorScheme={"messenger"} variant='solid' mt={'10px'}>
-                                        SEND
-                                    </Button>
-                                </form>
+                                <TableContainer p="5">
+                                    <Table variant={"simple"}>
+                                        <Thead>
+                                            <Tr>
+                                                <Th>Customer Name</Th>
+                                                {/* <Th isNumeric>Amount</Th> */}
+                                                <Th>Email</Th>
+                                                <Th>Address</Th>
+                                                <Th>Transfer NFT</Th>
+                                            </Tr>
+                                        </Thead>
+                                        {orders.length === 0 ?
+                                            <Box width={"100%"} alignItems="center">
+                                                <SkeletonText mt="4" noOfLines={4} spacing="4" />
+                                            </Box> :
+
+                                            <Tbody>
+                                                {orders.map(
+                                                    (order) => (
+                                                        <Tr>
+                                                            <Td>{order.billing_address?.first_name}</Td>
+                                                            <Td >
+                                                                {order.contact_email}
+                                                            </Td>
+                                                            <Td>{order.shipping_address?.address1}</Td>
+                                                            <Td>
+                                                                <SendNftModal code={order.discount_codes[0]?.code}
+                                                                    badge={nftState?.badge?.success?.data?.image}
+                                                                    name={order.billing_address?.first_name} tokenID={NFTokenID} />
+                                                            </Td>
+                                                        </Tr>
+                                                    )
+                                                )}
+                                            </Tbody>
+                                        }
+                                    </Table>
+                                </TableContainer>
+
+
+
                             </Box>
 
+                            {nftState.offer.loading ? <>
+                                <Loading></Loading>
+                            </> : ""}
 
                             {nftState.offer.success.ok ? <Box bg="white" maxW="5xl" mx="auto" borderRadius={10} p={5} mt={'24px'} boxShadow="md">
                                 <Heading size='xs' mb={'20px'} fontWeight={"semibold"}>
