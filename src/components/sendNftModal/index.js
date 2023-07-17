@@ -45,8 +45,7 @@ const SendNftModal = (props) => {
             <Button
                 onClick={() => onOpen()}
                 colorScheme={"messenger"} variant='solid'
-                isDisabled={nftState.offer.success.ok}
-                isLoading={nftState.offer.loading}
+                isDisabled={nftState.offer.success.ok || nftState.offer.loading}
                 loadingText='sending badge'
             >
                 Reward badge
