@@ -69,13 +69,14 @@ const SendNftModal = (props) => {
                                 />}
                         </Center>
                         <Text fontSize={'medium'} fontWeight={"semibold"} mt={'10'}>
-                            Do you really want to send this badge to {name} ?
+                            Do you really want to send this badge to <Text as={'span'} fontWeight={'bold'}>{name}</Text> ?
                         </Text>
 
                         <Flex justifyContent={'space-around'} mt={'5'}>
                             <Button
                                 onClick={handleCrateSellOffer}
                                 colorScheme={"green"} variant='solid'
+                                isDisabled={!badge}
                             >
                                 Proceed
                             </Button>
