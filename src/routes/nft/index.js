@@ -1,16 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import NavBar from "../../components/navbar";
 import useNFTStore from "../../store/nft";
-import { Box, Button, Center, Container, Flex, Heading, Image, Input, SkeletonText, Stack, StackDivider, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useToast } from '@chakra-ui/react';
+import { Box, Button, Center, Container, Flex, Grid, GridItem, Heading, Image, Input, SkeletonText, Stack, StackDivider, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useToast } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel, Textarea } from '@chakra-ui/react'
 import SendNftModal from '../../components/sendNftModal';
 import Loading from '../../components/loader';
+import axios from 'axios';
 
 
 const NFTRoute = () => {
 
     const [allOrders, setAllOrders] = useState([])
+    const [allNfts, setAllNfts] = useState(undefined)
     const shop = window.lookbook.shop
+    const nftState = useNFTStore((state) => state.nftState);
+    const postNFTState = useNFTStore((state) => state.postNFTState);
+    const postNFTBadge = useNFTStore((state) => state.postNFTBadge);
+    const storeNft = useNFTStore((state) => state.storeNft);
+    const selectNft = useNFTStore((state) => state.selectNft);
 
     useEffect(() => {
         fetch(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/get_orders?shop=${shop}`)
@@ -18,14 +25,22 @@ const NFTRoute = () => {
             .then(data => setAllOrders(data));
     }, [shop])
 
+    console.log(allOrders)
+
+    useEffect(() => {
+        const getNfts = async () => {
+            const { data } = await axios.get(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/get_nfts?shop=${shop}`);
+            setAllNfts(data)
+        }
+        getNfts()
+    }, [nftState.storeNft.loading, shop])
+
+
+
     let orders = allOrders.filter(order => order.discount_codes.length >= 0)
 
-    console.log(orders, "ORDERS")
 
-    const nftState = useNFTStore((state) => state.nftState);
-    const postNFTState = useNFTStore((state) => state.postNFTState);
-    const postNFTBadge = useNFTStore((state) => state.postNFTBadge);
-    const createSellOffer = useNFTStore((state) => state.createSellOffer);
+
     const toast = useToast();
     const imageHostKey = process.env.REACT_APP_IMAGE_BB_KEY
 
@@ -46,10 +61,7 @@ const NFTRoute = () => {
         })
             .then(res => res.json())
             .then(imgData => {
-                console.log("Image URL", imgData.data.url);
-
                 postNFTBadge(title, description, imgData.data.url)
-                console.log(nftState.badge, "Badge State")
             })
 
         form.reset();
@@ -59,52 +71,63 @@ const NFTRoute = () => {
     const handleCreateNFT = () => {
 
         const seed = process.env.REACT_APP_XRP_NFT_ACCOUNT_SEED;
-        const uri = `https://jubairhossain.pagekite.me:443/api/badge_nft?id=${nftState.badge.success.data.objectId}`;
+        const uri = `${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/badge_nft?id=${nftState.badge.success.data.objectId}`;
         const transferFee = 1;
         const flags = 8;
         postNFTState(seed, uri, transferFee, flags);
     }
 
 
-    if (nftState.post.success.ok) {
+    if (nftState.post.success.ok && !nftState.storeNft.success.ok) {
         toast({
             title: "NFT created successfully",
             status: "success",
         });
     }
 
-    if (nftState.offer.success.ok) {
-        toast({
-            title: "NFToken offer created successfully",
-            status: "success",
-        });
-    }
+    // if (nftState.offer.success.ok) {
+    //     toast({
+    //         title: "NFToken offer created successfully",
+    //         status: "success",
+    //     });
+    // }
+
+    // if (nftState.storeNft.success.ok) {
+    //     toast({
+    //         title: "NFT Badge saved",
+    //         status: "success",
+    //     });
+    // }
 
 
     let length = 0;
-    let NFTokenID = ""
     let token = ""
     length = nftState?.post?.success?.data?.result?.account_nfts.length;
 
 
     if (nftState?.post?.success?.data?.result?.account_nfts.length) {
-        NFTokenID = nftState?.post?.success?.data?.result?.account_nfts[length - 1]?.NFTokenID;
         token = nftState?.post?.success?.data?.result?.account_nfts[length - 1]
     }
 
-    const handleCrateSellOffer = (event) => {
-        event.preventDefault();
-        const form = event.target;
-        const seed = process.env.REACT_APP_XRP_NFT_ACCOUNT_SEED;
-        const tokenID = NFTokenID;
-        const flags = 1;
-        const destination = form.destination.value;
-        const amount = "0";
 
-        createSellOffer(seed, tokenID, amount, flags, destination);
+    const saveNft = () => {
+        const title = nftState?.badge?.success?.data?.name;
+        const image = nftState?.badge?.success?.data?.image;
+        const description = nftState?.badge?.success?.data?.description;
+        const token = nftState?.post?.success?.data?.result?.account_nfts[length - 1].NFTokenID;
 
-        form.reset();
+        if (token) {
+            storeNft(title, description, image, token)
+        }
     }
+
+
+    const handleSelectNft = (nft) => {
+        selectNft(nft);
+        console.log(nftState?.select?.success?.data)
+    }
+
+
 
 
 
@@ -121,7 +144,9 @@ const NFTRoute = () => {
                 <Tabs maxW="5xl" mx="auto" mt={"24px"}>
                     <TabList>
                         <Tab>Create</Tab>
+                        <Tab >Select</Tab>
                         <Tab>Transfer</Tab>
+
 
                     </TabList>
 
@@ -131,7 +156,7 @@ const NFTRoute = () => {
                                 <Text mb='8px' align={"center"} fontSize={"2xl"} mt={'8px'} fontWeight="bold" textColor={'black'} >Create Discount                  <Text as={'span'} textColor={'orange.500'}>Badges/NFT</Text> and send them to your customers for <Text as={'span'} textColor={'orange.500'}>bonus</Text> </Text>
 
                                 <Text my='14px'>
-                                    Just follow three simple steps...
+                                    Just follow four simple steps...
                                 </Text>
 
                                 {nftState.badge.success.ok ? <Text my='10px' fontWeight='semibold' fontSize={'xl'} textColor={'blue.600'}>
@@ -141,8 +166,16 @@ const NFTRoute = () => {
                                 </Text>}
 
                                 {nftState.post.success.ok ? <Text my='10px' fontWeight='semibold' fontSize={'xl'} textColor={'blue.600'}>
-                                    Step 3 - Go to the transfer tab from top and send the NFT badge to your customer.
-                                </Text> : ""}
+
+                                    Step 3 - Save your NFT badge.
+                                </Text> :
+                                    ""}
+
+                                {nftState.storeNft.success.ok ?
+                                    <Text my='10px' fontWeight='semibold' fontSize={'xl'} textColor={'blue.600'}>
+                                        Step 4 - Go to the transfer tab from top and send the NFT badge to your customer.
+
+                                    </Text> : ""}
 
 
 
@@ -178,7 +211,12 @@ const NFTRoute = () => {
                                     </Box>
                                     {nftState.badge.success.ok || nftState.post.success.ok ?
                                         <Box width={"50%"}>
-                                            <Heading fontSize={'large'} textAlign={'center'} my='16px'>Your Created Badge</Heading>
+
+                                            <Heading fontSize={'large'} textAlign={'center'} my='16px'>
+
+                                                {nftState.post.success.ok ?
+                                                    "Save your NFT badge" : "Your Created Badge"}
+                                            </Heading>
                                             <Center >
                                                 <Image
                                                     borderRadius='3xl'
@@ -191,10 +229,19 @@ const NFTRoute = () => {
                                                 <Text>{nftState.badge.success.data.name}</Text>
                                             </Center>
                                             <Center>
-                                                <Button isLoading={nftState.post.loading} colorScheme={"messenger"} variant='solid' mt={'10px'} isDisabled={nftState.post.success.ok}
-                                                    onClick={handleCreateNFT}>
-                                                    Create NFT with your badge
-                                                </Button>
+
+                                                {nftState.post.success.ok ?
+                                                    <Button isLoading={nftState.storeNft.loading} colorScheme={"messenger"} variant='solid' mt={'10px'}
+                                                        onClick={saveNft}
+                                                        isDisabled={nftState.storeNft.success.ok}>
+                                                        Save NFT Badge
+                                                    </Button> :
+                                                    <Button isLoading={nftState.post.loading} colorScheme={"messenger"} variant='solid' mt={'10px'} isDisabled={nftState.post.success.ok}
+                                                        onClick={handleCreateNFT}>
+                                                        Create NFT with your badge
+                                                    </Button>}
+
+
                                             </Center>
                                         </Box> : ""}
 
@@ -265,33 +312,80 @@ const NFTRoute = () => {
                             </Box> : ""}
                         </TabPanel>
 
+                        <TabPanel>
+                            <Center>
+                                <Heading fontSize={'2xl'}>
+                                    Select an <Text as={'span'} textColor={'blue.500'}>NFTs</Text> to reward your customer
+                                </Heading>
+                            </Center>
+                            {nftState.select.success?.data?.image ?
+                                <>
+                                    <Heading fontSize={'large'} textAlign={'center'} my='16px'>Your Selected Badge</Heading>
+                                    <Center >
+                                        <Image
+                                            borderRadius='3xl'
+                                            boxSize='150px'
+                                            src={nftState.select.success?.data?.image}
+                                            alt='Badge Image'
+                                        />
+                                    </Center>
+                                    <Text mt={'3'} fontWeight={'bold'} align={'center'}>{nftState.select.success?.data?.name}</Text>
 
+                                </> :
+                                ""}
+                            {allNfts ? <Center mt={'8'}>
+                                <Grid templateColumns='repeat(3, 1fr)' gap={'16'}>
+                                    {allNfts.map((nft, i) =>
+                                        <GridItem key={i} w='100%' bg={'white'} p={'2'} rounded={'2xl'}
+                                            _hover="{ bg: 'blue.500' }">
+                                            <Image
+                                                borderRadius='3xl'
+                                                boxSize='150px'
+                                                src={nft.image}
+                                                alt='Badge Image'
+                                            />
+                                            <Text align={'center'} mt={'1.5'} fontWeight={'semibold'}>
+                                                {nft.name}
+                                            </Text>
+                                            <Center>
+                                                <Button colorScheme={"messenger"} variant='solid' mt={'10px'} onClick={() => handleSelectNft(nft)}>
+                                                    Select
+                                                </Button>
+                                            </Center>
+                                        </GridItem>
+                                    )}
+
+                                </Grid>
+                            </Center> :
+                                <Loading />
+                            }
+                        </TabPanel>
 
                         <TabPanel>
                             <Box bg="white" maxW="5xl" mx="auto" borderRadius={10} p={5} mt={'24px'} boxShadow="md">
 
-                                {nftState.post.success.ok ?
-                                    <Box width={"100%"}>
+                                {nftState.offer.success.ok ?
+                                    "" : <Box width={"100%"}>
 
                                         <Text mb='8px' align={"center"} fontSize={"2xl"} mt={'8px'} fontWeight="bold" textColor={'orange.400'} >Send your created NFT badge to your desired customer </Text>
 
-                                        <Heading fontSize={'large'} textAlign={'center'} my='16px'>Your Created Badge</Heading>
+                                        <Heading fontSize={'large'} textAlign={'center'} my='16px'>Your Selected Badge</Heading>
                                         <Center >
                                             <Image
                                                 borderRadius='3xl'
                                                 boxSize='150px'
-                                                src={nftState.badge.success.data.image}
+                                                src={nftState.select.success?.data?.image}
                                                 alt='Badge Image'
                                             />
                                         </Center>
                                         <Center >
-                                            <Text fontWeight={'semibold'}>{nftState.badge.success.data.name}</Text>
+                                            <Text fontWeight={'semibold'}>{nftState.select.success?.data?.name}</Text>
                                         </Center>
                                         <Center >
-                                            <Text mt={'6px'}>{nftState.badge.success.data.description}</Text>
+                                            <Text mt={'6px'}>{nftState.badge.select?.data?.description}</Text>
                                         </Center>
 
-                                    </Box> : ""}
+                                    </Box>}
 
 
                                 {nftState.offer.loading ? <>
@@ -305,21 +399,9 @@ const NFTRoute = () => {
                                     <Stack divider={<StackDivider />} spacing='4'>
                                         {nftState.offer.success.data?.result?.offers?.map(offer =>
                                             <Box key={offer.NFTokenID}>
-                                                {/* <Text pt='2' fontSize='sm'>
-                                                    Offer Index :  <Text as={'span'} textColor={"green.600"} fontWeight={"bold"}>{offer.nft_offer_index}</Text>
-                                                </Text>
-                                                <Text pt='2' fontSize='sm'>
-                                                    Owner :  {offer.owner}
-                                                </Text>
-                                                <Text pt='2' fontSize='sm'>
-                                                    Amount:  {offer.amount}
-                                                </Text> */}
-
                                                 <Text>Your NFT Badge has been sent to XRP wallet address <Text as={'span'} fontWeight={'bold'}>{offer.destination}</Text>
                                                 </Text>
-                                                {/* <Text pt='2' fontSize='sm'>
-                                                    Destination:
-                                                </Text> */}
+
                                             </Box>)}
                                         <Text fontStyle={"italic"} as='u' cursor={'pointer'}>
                                             <a href={nftState.offer.success.data?.payload?.next?.always} target='_blank' rel="noreferrer">Offer Accept QR </a>
@@ -328,7 +410,7 @@ const NFTRoute = () => {
                                 </Box> : ""}
 
 
-                                <Text mb='4px' align={"center"} mt={'8px'} size="xl" fontWeight="bold" >See all of your orders</Text>
+                                <Text mb='4px' align={"center"} mt={'8px'} size="xl" fontWeight="bold" >All of your orders that were paid through XRP</Text>
 
 
 
@@ -358,11 +440,12 @@ const NFTRoute = () => {
                                                             <Td >
                                                                 {order.contact_email}
                                                             </Td>
-                                                            <Td>{order.shipping_address?.address1}</Td>
+                                                            <Td >{order.shipping_address?.address1}</Td>
                                                             <Td>
                                                                 <SendNftModal code={order.discount_codes[0]?.code}
-                                                                    badge={nftState?.badge?.success?.data?.image}
-                                                                    name={order.billing_address?.first_name} tokenID={NFTokenID} />
+                                                                    badge={nftState?.select?.success?.data?.image}
+                                                                    name={order.billing_address?.first_name}
+                                                                    tokenID={nftState?.select?.success?.data?.token} />
                                                             </Td>
                                                         </Tr>
                                                     )
@@ -381,7 +464,7 @@ const NFTRoute = () => {
                     </TabPanels>
                 </Tabs>
 
-            </Container>
+            </Container >
 
 
 

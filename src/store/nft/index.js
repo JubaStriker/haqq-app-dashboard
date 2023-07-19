@@ -47,6 +47,28 @@ const INITIAL_NFT_STATE = {
             error: false,
             message: "",
         },
+    },
+    storeNft: {
+        loading: false,
+        success: {
+            ok: false,
+            data: {},
+        },
+        failure: {
+            error: false,
+            message: "",
+        },
+    },
+    select: {
+        loading: false,
+        success: {
+            ok: false,
+            data: {},
+        },
+        failure: {
+            error: false,
+            message: "",
+        },
     }
 
 };
@@ -96,9 +118,7 @@ const useNFTStore = create((set) => ({
                         },
                     }))
                 );
-            }
-            console.log('Response:', data);
-            ;
+            };
         } catch (e) {
             console.error(e);
             throw e;
@@ -147,7 +167,7 @@ const useNFTStore = create((set) => ({
                     }))
                 );
             }
-            console.log('Response:', data);
+
             ;
         } catch (e) {
             console.error(e);
@@ -202,6 +222,95 @@ const useNFTStore = create((set) => ({
             throw e;
         }
     },
+    storeNft: async (title, description, image, token) => {
+        set(
+            produce((state) => ({
+                ...state,
+                nftState: {
+                    ...state.nftState,
+                    storeNft: {
+                        ...INITIAL_NFT_STATE.storeNft,
+                        loading: true,
+                    },
+                },
+            }))
+        );
+
+        try {
+            console.log(title, description, image, token);
+
+
+            const body = {
+                title: title,
+                description: description,
+                image: image,
+                token: token,
+                shop: window.lookbook.shop,
+            };
+
+            console.log(body);
+
+            const { data } = await axios.post(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/nft_store`, body)
+
+            if (data?.objectId) {
+                set(
+                    produce((state) => ({
+                        ...state,
+                        nftState: {
+                            ...state.nftState,
+                            storeNft: {
+                                ...INITIAL_NFT_STATE.storeNft,
+                                loading: false,
+                                success: {
+                                    ok: true,
+                                    data: data,
+                                },
+                            },
+                        },
+                    }))
+
+                );
+
+                console.log("NFTS", data);
+            }
+
+
+        }
+        catch (e) { }
+    },
+
+    selectNft: (nft) => {
+
+        const data = nft;
+
+        try {
+            if (data.name) {
+
+                set(
+                    produce((state) => ({
+                        ...state,
+                        nftState: {
+                            ...state.nftState,
+                            select: {
+                                ...INITIAL_NFT_STATE.select,
+                                loading: false,
+                                success: {
+                                    ok: true,
+                                    data: data,
+                                },
+                            }
+                        },
+                    }))
+                );
+            }
+        }
+        catch (e) {
+            console.error(e);
+        }
+
+    },
+
+
 
     createSellOffer: async (seed, tokenID, amount, flags, code) => {
         set(
