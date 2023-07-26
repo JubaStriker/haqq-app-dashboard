@@ -52,12 +52,13 @@ const EmbedInstructions = () => {
         textAlign={"left"}
       >
         <Heading textAlign="center" mb={4}>
-          Sell anywhere with <chakra.span color="blue.500">Hedera</chakra.span>
+          Sell anywhere with{" "}
+          <chakra.span color="blue.500">Crypto Shop</chakra.span>
         </Heading>
         <Center maxW="3xl" margin="0 auto" flexDirection="column">
           <Text align="center" fontSize="md">
-            Now, sell your store curated products on other sites and let Hedera
-            handle payments for you!
+            Now, sell your store curated products on other sites and let Crypto
+            Shop handle payments for you!
           </Text>
         </Center>
 
@@ -77,20 +78,22 @@ const EmbedInstructions = () => {
           <br />
           <UnorderedList spacing={2}>
             <ListItem>
-              <Code>npm install hbar-shop-react-sdk --save </Code>
+              <Code>npm install crypto-shop-react-sdk --save </Code>
             </ListItem>
             <ListItem>
-              <Code>yarn add hbar-shop-react-sdk </Code>
+              <Code>yarn add crypto-shop-react-sdk </Code>
             </ListItem>
             <ListItem>
               <Text>Import the component</Text>
-              <Code>import {`{HbarShop}`} from "hbar-shop-react-sdk"; </Code>
+              <Code>
+                import {`{CryptoShop}`} from "crypto-shop-react-sdk";{" "}
+              </Code>
             </ListItem>
             <ListItem>
               <Text>Render the componet</Text>
               <Code>
                 {`
-                <HbarShop
+                <CryptoShop
                     shop="jithendra-test-store.myshopify.com"
                     network="mainnet"
                 />
@@ -108,7 +111,7 @@ const EmbedInstructions = () => {
             Developer <chakra.span color="blue.500"> Webhooks</chakra.span>
           </Heading>
           <Text align="center" fontSize="md">
-            With Hbar Shop, the developers who sell your products on their site
+            With CryptoShop, the developers who sell your products on their site
             can also listen to events confirming the transaction.
           </Text>
           <FormControl onSubmit={formik.handleSubmit}>

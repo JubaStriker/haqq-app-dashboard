@@ -28,9 +28,8 @@ import useTransactionStore from "../../store/transaction";
 import { Link as ReactRouteLink } from "react-router-dom";
 
 const TransactionRoute = () => {
-
   let blockChain;
-  const retrievedObject = localStorage.getItem('blockchain');
+  const retrievedObject = localStorage.getItem("blockchain");
   const blockChainObj = JSON.parse(retrievedObject);
   blockChain = blockChainObj?.blockChain;
 
@@ -75,7 +74,7 @@ const TransactionRoute = () => {
           bg="#f6f6f7"
           textAlign={"left"}
         >
-          <Alert status="info" mb="5">
+          {/* <Alert status="info" mb="5">
             <AlertIcon />
             <Box>
               <AlertTitle>Now earn with your crypto!</AlertTitle>
@@ -87,7 +86,7 @@ const TransactionRoute = () => {
                 </ReactRouteLink>
               </AlertDescription>
             </Box>
-          </Alert>
+          </Alert> */}
 
           <Box bg="white" width={"5xl"} m="auto" p={5} borderRadius="10px">
             <VStack spacing={2} align="stretch">
@@ -95,7 +94,6 @@ const TransactionRoute = () => {
                 <Text size="xl" fontWeight="bold">
                   {blockChain === "hedera" ? "HABR Transaction Details" : ""}
                   {blockChain === "ripple" ? "XRP Transaction Details" : ""}
-
                 </Text>
                 <Divider borderColor="gray.200" />
               </Box>
@@ -112,7 +110,7 @@ const TransactionRoute = () => {
                     <Th>Transaction Ref</Th>
                   </Tr>
                 </Thead>
-                {blockChain === "hedera" ?
+                {blockChain === "hedera" ? (
                   <Tbody>
                     {transactionState?.get?.success?.data?.transactions?.map(
                       (details) => (
@@ -135,9 +133,11 @@ const TransactionRoute = () => {
                         </Tr>
                       )
                     )}
-                  </Tbody> :
-                  ""}
-                {blockChain === "ripple" ?
+                  </Tbody>
+                ) : (
+                  ""
+                )}
+                {blockChain === "ripple" ? (
                   <Tbody>
                     {transactionState.get.success.data?.result?.transactions?.map(
                       (details) => (
@@ -163,7 +163,10 @@ const TransactionRoute = () => {
                         </Tr>
                       )
                     )}
-                  </Tbody> : ""}
+                  </Tbody>
+                ) : (
+                  ""
+                )}
               </Table>
             </TableContainer>
           </Box>

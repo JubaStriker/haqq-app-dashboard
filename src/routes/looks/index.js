@@ -239,7 +239,7 @@ export const renderLooks = ({ looks, orangeColorMode, getLooks }) => {
         <Flex direction="column" align="center" px="10">
           <VStack spacing="3">
             <Heading as="h1" size="md" pt="10">
-              You have not created any HPAY shopping list yet.
+              You have not created any shopping list yet.
             </Heading>
           </VStack>
           <br />
@@ -291,7 +291,7 @@ function Looks(props) {
       } else {
         postViews({ shop, subscribed: false });
       }
-    } catch (e) { }
+    } catch (e) {}
   };
   useEffect(async () => {
     getLooks();
@@ -394,7 +394,7 @@ function Looks(props) {
         return (
           <Flex direction="column">
             <Text>
-              Hedera Shop widget <b>has been added</b> to your store page.
+              Crypto Shop widget <b>has been added</b> to your store page.
               &nbsp;
             </Text>
             <Text
@@ -409,7 +409,7 @@ function Looks(props) {
       } else {
         return (
           <Text>
-            Hedera Shop widget is <b>not added</b> to your store page.
+            Crypto Shop widget is <b>not added</b> to your store page.
           </Text>
         );
       }
@@ -497,7 +497,7 @@ function Looks(props) {
           >
             <Stack>
               <Text>
-                The Hedera Shop widget on your store has{" "}
+                The Crypto Shop widget on your store has{" "}
                 <b>{chargesState?.get?.success?.data?.views?.count}</b> views{" "}
               </Text>
               <Text>

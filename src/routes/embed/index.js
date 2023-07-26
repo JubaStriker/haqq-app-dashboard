@@ -308,7 +308,7 @@ const EmbedRoute = (props) => {
                     }
                     isFullWidth
                   >
-                    Hedera Shop
+                    Crypto Shop
                   </Button>
                 </Stack>
               </Box>
@@ -322,7 +322,7 @@ const EmbedRoute = (props) => {
   return (
     <Container maxW={"7xl"} p="12">
       <Center>
-        <Heading>Hedera Shop</Heading>
+        <Heading>Crypto Shop</Heading>
       </Center>
       <br />
       <SimpleGrid minChildWidth="330px" spacing="10px">

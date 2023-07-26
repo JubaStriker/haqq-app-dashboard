@@ -35,12 +35,10 @@ import useWalletStore from "../../store/wallet";
 import WAValidator from "multicoin-address-validator";
 
 const SettingsRoute = () => {
-
   let blockChain;
-  const retrievedObject = localStorage.getItem('blockchain');
+  const retrievedObject = localStorage.getItem("blockchain");
   const blockChainObj = JSON.parse(retrievedObject);
   blockChain = blockChainObj?.blockChain;
-
 
   const shop = useContext(ShopContext);
   const scripts = useScriptsStore((state) => state.scripts);
@@ -55,12 +53,14 @@ const SettingsRoute = () => {
   const getWalletAddress = useWalletStore((state) => state.getWalletAddress);
   const postWalletAddress = useWalletStore((state) => state.postWalletAddress);
 
-  const verifyWalletAddress = useWalletStore((state) => state.verifyWalletAddress);
-  console.log("Wallet address", walletAddress?.get?.success?.data)
+  const verifyWalletAddress = useWalletStore(
+    (state) => state.verifyWalletAddress
+  );
+  console.log("Wallet address", walletAddress?.get?.success?.data);
 
   const onSubmitHandler = async (data) => {
     // ----------------- Hedera ----------------- //
-    if (blockChain === 'hedera') {
+    if (blockChain === "hedera") {
       console.log(data);
       const { walletAddress, walletToken } = data;
       await verifyWalletAddress(walletAddress);
@@ -89,8 +89,7 @@ const SettingsRoute = () => {
       }
     }
     // ----------------- Ripple ----------------- //
-
-    else if (blockChain === 'ripple') {
+    else if (blockChain === "ripple") {
       const walletAddress = data;
 
       const valid = WAValidator.validate(walletAddress, "ripple");
@@ -120,38 +119,37 @@ const SettingsRoute = () => {
   // ------------------------------------------------------------------------------//
 
   const connectWallet = () => {
-    window.open(process.env.REACT_APP_SERVER_URL + '/connect-wallet', '_blank', 'noopener,noreferrer')
-  }
+    window.open(
+      process.env.REACT_APP_SERVER_URL + "/connect-wallet",
+      "_blank",
+      "noopener,noreferrer"
+    );
+  };
 
   let walletSchema;
 
-  if (blockChain === 'hedera') {
+  if (blockChain === "hedera") {
     walletSchema = Yup.object().shape({
       walletAddress: Yup.string().required("Wallet Address Is required"),
-      walletToken: Yup.string().required('Wallet USDCH Token to recieve HBAR'),
+      walletToken: Yup.string().required("Wallet USDCH Token to recieve HBAR"),
     });
-  }
-  else if (blockChain === 'ripple') {
+  } else if (blockChain === "ripple") {
     walletSchema = Yup.object().shape({
       walletAddress: Yup.string().required("Wallet Address Is required"),
     });
   }
-
-
 
   const formik = useFormik({
     initialValues: { walletAddress: "", walletToken: "" },
     validationSchema: walletSchema,
     onSubmit: (values) => {
-      if (values && blockChain === 'hedera') {
+      if (values && blockChain === "hedera") {
         onSubmitHandler(values);
-      }
-      else if (values && blockChain === 'ripple') {
+      } else if (values && blockChain === "ripple") {
         onSubmitHandler(values.walletAddress);
       }
     },
   });
-
 
   useEffect(() => {
     getWalletAddress(shop);
@@ -159,7 +157,7 @@ const SettingsRoute = () => {
   }, []);
 
   useEffect(() => {
-    if (blockChain === 'hedera') {
+    if (blockChain === "hedera") {
       formik.setFieldValue(
         "walletAddress",
         walletAddress?.get?.success?.data?.walletAddress || ""
@@ -168,15 +166,13 @@ const SettingsRoute = () => {
         "walletToken",
         walletAddress?.get?.success?.data?.walletToken || ""
       );
-    }
-    else if (blockChain === 'ripple') {
+    } else if (blockChain === "ripple") {
       formik.setFieldValue(
         "walletAddress",
         walletAddress?.get?.success?.data?.walletAddress || ""
       );
     }
   }, [walletAddress?.get?.success?.data?.walletAddress]);
-
 
   // --------------------------------------------------------------------------------//
 
@@ -196,8 +192,6 @@ const SettingsRoute = () => {
     }
   };
 
-
-
   // ------------------------------------------------------------------------------------//
   const AddressInput = () => {
     if (walletAddress.get.loading) {
@@ -209,10 +203,11 @@ const SettingsRoute = () => {
     } else if (walletAddress.get.success.ok) {
       return (
         <Box>
-          {blockChain === 'hedera' ?
+          {blockChain === "hedera" ? (
             <>
               <Text size="xl" fontWeight="bold" pb="5px">
-                HBAR wallet address and Token ID where to receive HBAR from customer
+                HBAR wallet address and Token ID where to receive HBAR from
+                customer
               </Text>
               <FormControl
                 onSubmit={formik.handleSubmit}
@@ -231,12 +226,13 @@ const SettingsRoute = () => {
                 />
 
                 <FormHelperText size="sm" color={"red"}>
-                  {formik.touched.walletAddress && formik.errors.walletAddress ? (
+                  {formik.touched.walletAddress &&
+                  formik.errors.walletAddress ? (
                     formik.errors.walletAddress
                   ) : (
                     <FormErrorMessage>
-                      Please check HBAR wallet address where to receive HBAR from
-                      customer
+                      Please check HBAR wallet address where to receive HBAR
+                      from customer
                     </FormErrorMessage>
                   )}
                 </FormHelperText>
@@ -263,13 +259,12 @@ const SettingsRoute = () => {
                     formik.errors.walletToken
                   ) : (
                     <FormErrorMessage>
-                      Please check HBAR wallet address or Token ID where to receive HBAR from
-                      customer
+                      Please check HBAR wallet address or Token ID where to
+                      receive HBAR from customer
                     </FormErrorMessage>
                   )}
                 </FormHelperText>
               </FormControl>
-
 
               <HStack>
                 <Button
@@ -293,12 +288,16 @@ const SettingsRoute = () => {
                   Connect to HBAR Wallet
                 </Button>
               </HStack>
-            </> : ""}
+            </>
+          ) : (
+            ""
+          )}
 
-          {blockChain === 'ripple' ?
+          {blockChain === "ripple" ? (
             <>
               <Text size="xl" fontWeight="bold" pb="5px">
-                XRP wallet public address where you would receive XRP from customers
+                XRP wallet public address where you would receive XRP from
+                customers
               </Text>
               <FormControl
                 onSubmit={formik.handleSubmit}
@@ -316,7 +315,8 @@ const SettingsRoute = () => {
                 />
 
                 <FormHelperText size="sm" color={"red"}>
-                  {formik.touched.walletAddress && formik.errors.walletAddress ? (
+                  {formik.touched.walletAddress &&
+                  formik.errors.walletAddress ? (
                     formik.errors.walletAddress
                   ) : (
                     <FormErrorMessage>
@@ -337,12 +337,14 @@ const SettingsRoute = () => {
               >
                 Submit
               </Button>
-            </> : ""}
+            </>
+          ) : (
+            ""
+          )}
         </Box>
       );
     }
   };
-
 
   const disableWidget = async () => {
     try {
@@ -415,9 +417,9 @@ const SettingsRoute = () => {
                 Widget Embed Settings
               </Text>
               <Text mt="4" fontSize="sm">
-                Enable or disable the Hedera Shop widget on your store. The widget
-                gets appended to the bottom of your store page above the footer
-                on the home page.
+                Enable or disable the Crypto Shop widget on your store. The
+                widget gets appended to the bottom of your store page above the
+                footer on the home page.
               </Text>
               <ButtonGroup mt="4" spacing="6">
                 {renderButton()}
@@ -433,7 +435,7 @@ const SettingsRoute = () => {
                     </Text>
                   </Box>
                   <Box>
-                    <Code children={`<div id="hpay-shop-app"> </div>`}></Code>
+                    <Code children={`<div id="crypto-shop-app"> </div>`}></Code>
                   </Box>
                 </SimpleGrid>
               </Alert>
