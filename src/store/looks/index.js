@@ -113,7 +113,7 @@ const useLooksStore = create((set, get) => ({
 			})))
 		}
 	},
-	postLooks: async ({ id, shop = window.lookbook.shop, name, price, medias, products = [], lookHbarPrice, lookXrpPrice }) => {
+	postLooks: async ({ id, shop = window.lookbook.shop, name, price, medias, products = [], lookHbarPrice, lookXrpPrice, lookNearPrice, cryptoReceiver }) => {
 		set(produce(state => ({
 			...state,
 			looks: {
@@ -135,6 +135,8 @@ const useLooksStore = create((set, get) => ({
 				blockchain,
 				lookHbarPrice,
 				lookXrpPrice,
+				lookNearPrice,
+				cryptoReceiver
 			});
 			set(produce(state => ({
 				...state,
@@ -169,7 +171,7 @@ const useLooksStore = create((set, get) => ({
 			throw e;
 		}
 	},
-	patchLooks: async ({ id, shop = window.lookbook.shop, name, price, medias, products = [] }) => {
+	patchLooks: async ({ id, shop = window.lookbook.shop, name, price, medias, products = [], lookHbarPrice, lookXrpPrice, lookNearPrice, cryptoReceiver }) => {
 		set(produce(state => ({
 			...state,
 			looks: {
@@ -187,7 +189,12 @@ const useLooksStore = create((set, get) => ({
 				name,
 				price,
 				medias,
-				products
+				products,
+				blockchain,
+				lookHbarPrice,
+				lookXrpPrice,
+				lookNearPrice,
+				cryptoReceiver
 			});
 
 			set(produce(state => ({

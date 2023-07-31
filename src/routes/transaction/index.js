@@ -45,7 +45,7 @@ const TransactionRoute = () => {
     getTransactionState(shop);
   }, []);
 
-  if (transactionState.get.success.data.length === 0) {
+  if (transactionState.get.success?.data?.length === 0) {
     return (
       <>
         <NavBar />

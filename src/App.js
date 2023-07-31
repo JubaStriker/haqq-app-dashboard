@@ -10,7 +10,7 @@ function App() {
 
   //-------------- Setting the Blockchain network -----------//
 
-  const blockChainNetwork = { blockChain: "ripple" }
+  const blockChainNetwork = { blockChain: "near" }
   localStorage.setItem('blockchain', JSON.stringify(blockChainNetwork));
 
   //-------------- Default Blockchain network is set to HEDERA -----------//
@@ -41,7 +41,6 @@ function App() {
   //     console.log('Can not detect incognito')
   // }
 
-  window.cryptoEnv = "hedera";
 
   const [isEmbed, setIsEmbed] = useState(false);
   useEffect(() => {

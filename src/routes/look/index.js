@@ -61,11 +61,14 @@ import useLooksStore from "../../store/looks";
 import { INTERNAL_SERVER_ERROR } from "../../constants/strings";
 import { ShopContext } from "../../context";
 import useCurrencyExchangeStore from "../../store/currency-exchage";
+import useWalletStore from "../../store/wallet";
 
 let blockChain;
 const retrievedObject = localStorage.getItem('blockchain');
 const blockChainObj = JSON.parse(retrievedObject);
 blockChain = blockChainObj?.blockChain;
+
+
 
 const renderSkeleton = () => {
   return (
@@ -92,6 +95,7 @@ function CreateLooks(props) {
     onOpen: onResourcePickerOpen,
     onClose: onResourcePickerClose,
   } = useDisclosure();
+  const walletAddress = useWalletStore((state) => state.walletState);
   const looks = useLooksStore((state) => state.looks);
   const files = useFilesStore((state) => state.files);
   const getLooks = useLooksStore((state) => state.getLooks);
@@ -102,12 +106,19 @@ function CreateLooks(props) {
   const postScripts = useScriptsStore((state) => state.postScripts);
   const getScripts = useScriptsStore((state) => state.getScripts);
 
+
   const currencyExchangeState = useCurrencyExchangeStore(
     (state) => state.currencyExchangeState
   );
   const getCurrencyExchangeState = useCurrencyExchangeStore(
     (state) => state.getCurrencyExchangeState
   );
+  const getWalletAddress = useWalletStore((state) => state.getWalletAddress);
+
+
+
+  console.log(currencyExchangeState, "Currency exchange state")
+  console.log(looks.get, "Looks state")
 
   const { id = "" } = useParams();
   const toast = useToast();
@@ -117,9 +128,26 @@ function CreateLooks(props) {
   const [looksPrice, setLooksPrice] = useState(props.looks.price);
   const [lookHbarPrice, setLookHbarPrice] = useState();
   const [lookXrpPrice, setLookXrpPrice] = useState();
+  const [lookNearPrice, setLookNearPrice] = useState();
   const [uploads, setUploads] = useState(props.looks.files || []);
   const [products, setProducts] = useState(props.looks.products || []);
   const [exchangeRate, setExchageRate] = useState();
+
+
+  useEffect(() => {
+    getWalletAddress(shop);
+
+  }, []);
+
+  let cryptoReceiver;
+  if (walletAddress?.get?.success?.data?.walletAddress) {
+    cryptoReceiver = walletAddress?.get?.success?.data?.walletAddress
+  }
+  console.log(cryptoReceiver)
+
+
+
+
 
   const [totalProductsPrice, setTotlaProductsPrice] = useState("");
   const onUploadWidgetClose = (data = []) => {
@@ -137,6 +165,11 @@ function CreateLooks(props) {
     else if (blockChain === 'ripple') {
       setLookXrpPrice(
         (currencyExchangeState.get.success.data.xrp * data).toFixed(2)
+      );
+    }
+    else if (blockChain === 'near') {
+      setLookNearPrice(
+        (currencyExchangeState.get.success.data * data).toFixed(2)
       );
     }
   };
@@ -349,6 +382,11 @@ function CreateLooks(props) {
                   Items in this curation can be bought by paying with XRP
                 </Heading>
                 : ""}
+              {blockChain === 'near' ?
+                <Heading size="sm">
+                  Items in this curation can be bought by paying with NEAR
+                </Heading>
+                : ""}
 
             </Stack>
             <Box mt={10}>
@@ -363,6 +401,10 @@ function CreateLooks(props) {
                         price: looksPrice,
                         medias: uploads,
                         products: products.map((product) => product.id),
+                        lookHbarPrice,
+                        lookXrpPrice,
+                        lookNearPrice,
+                        cryptoReceiver: walletAddress?.get?.success?.data?.walletAddress
                       });
                     } else {
                       await postLooks({
@@ -371,7 +413,9 @@ function CreateLooks(props) {
                         medias: uploads,
                         products: products.map((product) => product.id),
                         lookHbarPrice,
-                        lookXrpPrice
+                        lookXrpPrice,
+                        lookNearPrice,
+                        cryptoReceiver: walletAddress?.get?.success?.data?.walletAddress,
                       });
                       try {
                         const scriptsOnStore = await getScripts(shop);
@@ -536,6 +580,15 @@ function CreateLooks(props) {
                           )}
                         </InputRightAddon>
                         : ""}
+                      {blockChain === 'near' ?
+                        <InputRightAddon w={"50%"}>
+                          {currencyExchangeState.get.loading ? (
+                            <Spinner />
+                          ) : (
+                            `${lookNearPrice ? lookNearPrice : "0"} NEAR`
+                          )}
+                        </InputRightAddon>
+                        : ""}
 
 
                     </InputGroup>
@@ -549,6 +602,13 @@ function CreateLooks(props) {
                     {blockChain === 'ripple' ?
                       <FormHelperText>
                         The total number of XRP a customer has to pay to shop all
+                        of the above products in this curation. Please add a
+                        discounted price to encourage community.
+                      </FormHelperText>
+                      : ""}
+                    {blockChain === 'near' ?
+                      <FormHelperText>
+                        The total number of NEAR tokens a customer has to pay to shop all
                         of the above products in this curation. Please add a
                         discounted price to encourage community.
                       </FormHelperText>

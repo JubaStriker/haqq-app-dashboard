@@ -175,6 +175,12 @@ const DesktopNav = () => {
           src="https://sweatcoinguide.com/wp-content/uploads/2017/12/ripple-xrp-logo.png" /> :
         ""
       }
+      {blockchain === 'near' ?
+        <Image
+          height="32px"
+          src="https://seeklogo.com/images/N/near-protocol-near-logo-3CBD263358-seeklogo.com.png" /> :
+        ""
+      }
 
     </Stack>
   );

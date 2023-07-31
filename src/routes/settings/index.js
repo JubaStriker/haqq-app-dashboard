@@ -115,6 +115,32 @@ const SettingsRoute = () => {
         });
       }
     }
+    else if (blockChain === 'near') {
+      const walletAddress = data;
+
+      const valid = true;
+      if (valid === true) {
+        try {
+          await postWalletAddress({ shop, walletAddress });
+          toast({
+            title: "Wallet address added successfully!",
+            status: "success",
+            duration: 3000,
+          });
+        } catch (e) {
+          toast({
+            title: e.message || "Something went wrong.",
+            status: "error",
+            duration: 3000,
+          });
+        }
+      } else {
+        toast({
+          title: "Wallet Address is Invalid",
+          status: "error",
+        });
+      }
+    }
   };
   // ------------------------------------------------------------------------------//
 
@@ -148,6 +174,9 @@ const SettingsRoute = () => {
       } else if (values && blockChain === "ripple") {
         onSubmitHandler(values.walletAddress);
       }
+      else if (values && blockChain === "near") {
+        onSubmitHandler(values.walletAddress);
+      }
     },
   });
 
@@ -166,12 +195,20 @@ const SettingsRoute = () => {
         "walletToken",
         walletAddress?.get?.success?.data?.walletToken || ""
       );
-    } else if (blockChain === "ripple") {
+    }
+    else if (blockChain === "ripple") {
       formik.setFieldValue(
         "walletAddress",
         walletAddress?.get?.success?.data?.walletAddress || ""
       );
     }
+    else if (blockChain === "near") {
+      formik.setFieldValue(
+        "walletAddress",
+        walletAddress?.get?.success?.data?.walletAddress || ""
+      );
+    }
+
   }, [walletAddress?.get?.success?.data?.walletAddress]);
 
   // --------------------------------------------------------------------------------//
@@ -200,7 +237,7 @@ const SettingsRoute = () => {
           <SkeletonText mt="4" noOfLines={4} spacing="4" />
         </Box>
       );
-    } else if (walletAddress.get.success.ok) {
+    } else if (walletAddress.get.success.ok || !walletAddress.get.success.ok) {
       return (
         <Box>
           {blockChain === "hedera" ? (
@@ -227,7 +264,7 @@ const SettingsRoute = () => {
 
                 <FormHelperText size="sm" color={"red"}>
                   {formik.touched.walletAddress &&
-                  formik.errors.walletAddress ? (
+                    formik.errors.walletAddress ? (
                     formik.errors.walletAddress
                   ) : (
                     <FormErrorMessage>
@@ -311,16 +348,65 @@ const SettingsRoute = () => {
                   type="text"
                   placeholder="XRP Wallet Address"
                   onChange={formik.handleChange}
+                  value={formik?.values?.walletAddress}
+                />
+
+                <FormHelperText size="sm" color={"red"}>
+                  {formik.touched.walletAddress &&
+                    formik.errors.walletAddress ? (
+                    formik.errors.walletAddress
+                  ) : (
+                    <FormErrorMessage>
+                      Please check XRP wallet address where to receive XRP from
+                      customers
+                    </FormErrorMessage>
+                  )}
+                </FormHelperText>
+              </FormControl>
+
+              <Button
+                mt={4}
+                onClick={formik.handleSubmit}
+                isLoading={walletAddress.post.loading}
+                type="submit"
+                size="sm"
+                colorScheme={"messenger"}
+              >
+                Submit
+              </Button>
+            </>
+          ) : (
+            ""
+          )}
+
+          {blockChain === "near" ? (
+            <>
+              <Text size="xl" fontWeight="bold" pb="5px">
+                NEAR wallet public address where you would receive NEAR from
+                customers
+              </Text>
+              <FormControl
+                onSubmit={formik.handleSubmit}
+                isInvalid={
+                  formik.touched.walletAddress && formik.errors.walletAddress
+                }
+              >
+                <Input
+                  id="walletAddress"
+                  name="walletAddress"
+                  type="text"
+                  placeholder="NEAR Wallet Address"
+                  onChange={formik.handleChange}
                   value={formik.values.walletAddress}
                 />
 
                 <FormHelperText size="sm" color={"red"}>
                   {formik.touched.walletAddress &&
-                  formik.errors.walletAddress ? (
+                    formik.errors.walletAddress ? (
                     formik.errors.walletAddress
                   ) : (
                     <FormErrorMessage>
-                      Please check XRP wallet address where to receive XRP from
+                      Please check NEAR wallet address where to receive NEAR from
                       customers
                     </FormErrorMessage>
                   )}

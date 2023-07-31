@@ -4,10 +4,10 @@ import produce from "immer";
 import { HashConnect } from "hashconnect";
 import { PublicKey, TokenCreateTransaction } from "@hashgraph/sdk";
 
-let blockChain;
+let blockchain;
 const retrievedObject = localStorage.getItem('blockchain');
 const blockChainObj = JSON.parse(retrievedObject);
-blockChain = blockChainObj?.blockChain;
+blockchain = blockChainObj?.blockChain;
 
 const VERIFY_WALLET_STATE = {
   get: {
@@ -124,7 +124,7 @@ const useWalletStore = create((set, address) => ({
 
     try {
       const { data } = await axios.get(
-        `${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/get_shop?shop=${shop}&blockchain=${blockChain}`
+        `${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/get_shop?shop=${shop}&blockchain=${blockchain}`
       );
       // console.log(data);
       set(
@@ -181,7 +181,8 @@ const useWalletStore = create((set, address) => ({
         {
           shop,
           walletAddress,
-          walletToken
+          walletToken,
+          blockchain
         }
       );
       set(

@@ -85,20 +85,6 @@ const NFTRoute = () => {
         });
     }
 
-    // if (nftState.offer.success.ok) {
-    //     toast({
-    //         title: "NFToken offer created successfully",
-    //         status: "success",
-    //     });
-    // }
-
-    // if (nftState.storeNft.success.ok) {
-    //     toast({
-    //         title: "NFT Badge saved",
-    //         status: "success",
-    //     });
-    // }
-
 
     let length = 0;
     let token = ""

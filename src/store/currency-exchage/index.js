@@ -79,6 +79,25 @@ const useCurrencyExchangeStore = create((set) => ({
                     }))
                 )
             }
+            else if (blockChain === 'near') {
+                response = await axios.get('https://api.coinconvert.net/convert/usd/near?amount=1');
+                console.log(response);
+                set(
+                    produce((state) => ({
+                        ...state,
+                        currencyExchangeState: {
+                            ...state.currencyExchangeState,
+                            get: {
+                                ...INITIAL_CURRENCY_EXCHANGE_SATAE.get,
+                                success: {
+                                    ok: true,
+                                    data: response.data.NEAR,
+                                }
+                            }
+                        }
+                    }))
+                )
+            }
             return response;
         } catch (e) {
             console.log(e);
