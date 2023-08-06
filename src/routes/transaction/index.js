@@ -171,15 +171,18 @@ const TransactionRoute = () => {
                 )}
                 {blockChain === "near" ? (
                   <Tbody>
-                    <Center>
-                      <Heading >Coming Soon</Heading>
-                    </Center>
+
                   </Tbody>
                 ) : (
                   ""
                 )}
               </Table>
             </TableContainer>
+            {blockChain === "near" ?
+              <Center>
+                <Heading >Coming Soon...</Heading>
+              </Center> : ""}
+
           </Box>
         </Container>
       </>
