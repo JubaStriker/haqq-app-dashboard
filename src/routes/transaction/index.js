@@ -20,6 +20,7 @@ import {
   Alert,
   AlertTitle,
   AlertDescription,
+  Center,
 } from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
 import NavBar from "../../components/navbar";
@@ -94,6 +95,7 @@ const TransactionRoute = () => {
                 <Text size="xl" fontWeight="bold">
                   {blockChain === "hedera" ? "HABR Transaction Details" : ""}
                   {blockChain === "ripple" ? "XRP Transaction Details" : ""}
+                  {blockChain === "near" ? "NEAR Transaction Details" : ""}
                 </Text>
                 <Divider borderColor="gray.200" />
               </Box>
@@ -163,6 +165,15 @@ const TransactionRoute = () => {
                         </Tr>
                       )
                     )}
+                  </Tbody>
+                ) : (
+                  ""
+                )}
+                {blockChain === "near" ? (
+                  <Tbody>
+                    <Center>
+                      <Heading >Coming Soon</Heading>
+                    </Center>
                   </Tbody>
                 ) : (
                   ""
