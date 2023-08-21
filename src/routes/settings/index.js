@@ -33,6 +33,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import useWalletStore from "../../store/wallet";
 import WAValidator from "multicoin-address-validator";
+import StellarSdk from "stellar-sdk";
 
 const SettingsRoute = () => {
   let blockChain;
@@ -115,6 +116,8 @@ const SettingsRoute = () => {
         });
       }
     }
+
+    // ----------------- Near ----------------- //
     else if (blockChain === 'near') {
       const walletAddress = data;
 
@@ -141,7 +144,36 @@ const SettingsRoute = () => {
         });
       }
     }
-  };
+    // ----------------- Stellar ----------------- //
+    else if (blockChain === 'stellar') {
+      const { walletAddress } = data;
+      const isValidKey = StellarSdk.StrKey.isValidEd25519PublicKey(walletAddress);
+      if (isValidKey) {
+        try {
+          await postWalletAddress({ shop, walletAddress });
+          toast({
+            title: "Wallet address added successfully!",
+            status: "success",
+            duration: 3000,
+          });
+        } catch (e) {
+          toast({
+            title: e.message || "Something went wrong.",
+            status: "error",
+            duration: 3000,
+          });
+        }
+      } else {
+        toast({
+          title: "Your XLM Wallet public address is invalid",
+          status: "error",
+          duration: 3000,
+        });
+      }
+    }
+  }
+
+
   // ------------------------------------------------------------------------------//
 
   const connectWallet = () => {
@@ -159,7 +191,7 @@ const SettingsRoute = () => {
       walletAddress: Yup.string().required("Wallet Address Is required"),
       walletToken: Yup.string().required("Wallet USDCH Token to recieve HBAR"),
     });
-  } else if (blockChain === "ripple") {
+  } else if (blockChain === "ripple" || blockChain === "near" || blockChain === "stellar") {
     walletSchema = Yup.object().shape({
       walletAddress: Yup.string().required("Wallet Address Is required"),
     });
@@ -176,6 +208,9 @@ const SettingsRoute = () => {
       }
       else if (values && blockChain === "near") {
         onSubmitHandler(values.walletAddress);
+      }
+      else if (values && blockChain === "stellar") {
+        onSubmitHandler(values);
       }
     },
   });
