@@ -12,21 +12,16 @@ import {
   VStack,
   Text,
   Divider,
-  useColorMode,
   Link,
-  AlertIcon,
   SkeletonCircle,
   SkeletonText,
-  Alert,
-  AlertTitle,
-  AlertDescription,
   Center,
 } from "@chakra-ui/react";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import NavBar from "../../components/navbar";
 import { ShopContext } from "../../context";
 import useTransactionStore from "../../store/transaction";
-import { Link as ReactRouteLink } from "react-router-dom";
+
 
 const TransactionRoute = () => {
   let blockChain;
@@ -36,8 +31,7 @@ const TransactionRoute = () => {
 
   const shop = useContext(ShopContext);
   const transactionState = useTransactionStore(
-    (state) => state.transactionState
-  );
+    (state) => state.transactionState);
   const getTransactionState = useTransactionStore(
     (state) => state.getTransactionState
   );

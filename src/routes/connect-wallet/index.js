@@ -1,5 +1,5 @@
 import { Flex, Box, VStack, Button } from "@chakra-ui/react";
-import { useEffect, useContext } from "react";
+import { useContext } from "react";
 import { ShopContext } from "../../context";
 
 import useWalletStore from "../../store/wallet";
@@ -25,8 +25,8 @@ const ConnectWallet = () => {
   };
 
   const createTokenHandler = () => {
-      const { accountId, network, topic } = walletState.get.success.data;
-      createUSDHToken({ accountId, network, topic });
+    const { accountId, network, topic } = walletState.get.success.data;
+    createUSDHToken({ accountId, network, topic });
   }
 
   const getGeneratedTokenHandler = () => {
@@ -72,14 +72,14 @@ const ConnectWallet = () => {
                 _hover={{ bgGradient: "linear(to-bl, #ada1ed,#8e55a1)" }}
                 color="white"
               >
-                Creat Token
+                Create Token
               </Button>
 
               <Button
-              onClick={() => getGeneratedTokenHandler()}
-              bgGradient="linear(to-bl, #594bab,#4d2c58)"
-              _hover={{ bgGradient: "linear(to-bl, #ada1ed,#8e55a1)" }}
-              color="white"
+                onClick={() => getGeneratedTokenHandler()}
+                bgGradient="linear(to-bl, #594bab,#4d2c58)"
+                _hover={{ bgGradient: "linear(to-bl, #ada1ed,#8e55a1)" }}
+                color="white"
               >
                 Get Generated Token
               </Button>
