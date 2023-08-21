@@ -117,6 +117,7 @@ function CreateLooks(props) {
   const colorMode = useColorModeValue("gray.100", "gray.700");
   const [looksName, setLooksName] = useState(props.looks.name);
   const [looksPrice, setLooksPrice] = useState(props.looks.price);
+  const [lookCryptoPrice, setLookCryptoPrice] = useState();
   const [lookHbarPrice, setLookHbarPrice] = useState();
   const [lookXrpPrice, setLookXrpPrice] = useState();
   const [lookXlmPrice, setLookXlmPrice] = useState();
@@ -150,22 +151,22 @@ function CreateLooks(props) {
   const getExchangeRate = (data) => {
     console.log(data);
     if (blockChain === 'hedera') {
-      setLookHbarPrice(
+      setLookCryptoPrice(
         (currencyExchangeState.get.success.data * data).toFixed(2)
       );
     }
     else if (blockChain === 'ripple') {
-      setLookXrpPrice(
+      setLookCryptoPrice(
         (currencyExchangeState.get.success.data.xrp * data).toFixed(2)
       );
     }
     else if (blockChain === 'near') {
-      setLookNearPrice(
+      setLookCryptoPrice(
         (currencyExchangeState.get.success.data * data).toFixed(2)
       );
     }
     else if (blockChain === 'stellar') {
-      setLookXlmPrice(
+      setLookCryptoPrice(
         (currencyExchangeState?.get?.success?.data * data).toFixed(2)
       );
     } else {
@@ -408,10 +409,7 @@ function CreateLooks(props) {
                         price: looksPrice,
                         medias: uploads,
                         products: products.map((product) => product.id),
-                        lookHbarPrice,
-                        lookXrpPrice,
-                        lookNearPrice,
-                        lookXlmPrice,
+                        lookCryptoPrice,
                         cryptoReceiver: walletAddress?.get?.success?.data?.walletAddress
                       });
                     } else {
@@ -420,10 +418,7 @@ function CreateLooks(props) {
                         price: looksPrice,
                         medias: uploads,
                         products: products.map((product) => product.id),
-                        lookHbarPrice,
-                        lookXrpPrice,
-                        lookNearPrice,
-                        lookXlmPrice,
+                        lookCryptoPrice,
                         cryptoReceiver: walletAddress?.get?.success?.data?.walletAddress,
                       });
                       try {
@@ -575,7 +570,7 @@ function CreateLooks(props) {
                           {currencyExchangeState.get.loading ? (
                             <Spinner />
                           ) : (
-                            `${lookHbarPrice ? lookHbarPrice : "0"} HBAR`
+                            `${lookCryptoPrice ? lookCryptoPrice : "0"} HBAR`
                           )}
                         </InputRightAddon>
                         : ""}
@@ -585,7 +580,7 @@ function CreateLooks(props) {
                           {currencyExchangeState.get.loading ? (
                             <Spinner />
                           ) : (
-                            `${lookXrpPrice ? lookXrpPrice : "0"} XRP`
+                            `${lookCryptoPrice ? lookCryptoPrice : "0"} XRP`
                           )}
                         </InputRightAddon>
                         : ""}
@@ -594,7 +589,7 @@ function CreateLooks(props) {
                           {currencyExchangeState.get.loading ? (
                             <Spinner />
                           ) : (
-                            `${lookNearPrice ? lookNearPrice : "0"} NEAR`
+                            `${lookCryptoPrice ? lookCryptoPrice : "0"} NEAR`
                           )}
                         </InputRightAddon>
                         : ""}
@@ -603,7 +598,7 @@ function CreateLooks(props) {
                           {currencyExchangeState.get.loading ? (
                             <Spinner />
                           ) : (
-                            `${lookXlmPrice ? lookXlmPrice : "0"} XLM`
+                            `${lookCryptoPrice ? lookCryptoPrice : "0"} XLM`
                           )}
                         </InputRightAddon>
                         : ""}
