@@ -189,7 +189,7 @@ const SettingsRoute = () => {
   if (blockChain === "hedera") {
     walletSchema = Yup.object().shape({
       walletAddress: Yup.string().required("Wallet Address Is required"),
-      walletToken: Yup.string().required("Wallet USDCH Token to recieve HBAR"),
+      walletToken: Yup.string().required("Wallet USDCH Token to receive HBAR"),
     });
   } else if (blockChain === "ripple" || blockChain === "near" || blockChain === "stellar") {
     walletSchema = Yup.object().shape({
@@ -238,6 +238,12 @@ const SettingsRoute = () => {
       );
     }
     else if (blockChain === "near") {
+      formik.setFieldValue(
+        "walletAddress",
+        walletAddress?.get?.success?.data?.walletAddress || ""
+      );
+    }
+    else if (blockChain === "stellar") {
       formik.setFieldValue(
         "walletAddress",
         walletAddress?.get?.success?.data?.walletAddress || ""
@@ -462,6 +468,63 @@ const SettingsRoute = () => {
           ) : (
             ""
           )}
+          {blockChain === "stellar" ? (
+            <>
+              <Text size="xl" fontWeight="bold" pb="5px">
+                XLM wallet public address where you would receive XLM/USDC from
+                customers
+              </Text>
+              <FormControl
+                onSubmit={formik.handleSubmit}
+                isInvalid={
+                  formik.touched.walletAddress && formik.errors.walletAddress
+                }
+              >
+                <FormLabel>Your XLM Wallet Public Key</FormLabel>
+                <Input
+                  id="walletAddress"
+                  name="walletAddress"
+                  type="text"
+                  placeholder="XLM Wallet Public Address"
+                  onChange={formik.handleChange}
+                  value={formik.values.walletAddress}
+                />
+
+                <FormHelperText size="sm" color={"red"}>
+                  {formik.touched.walletAddress && formik.errors.walletAddress ? (
+                    formik.errors.walletAddress
+                  ) : (
+                    <FormErrorMessage>
+                      Your XLM wallet address is required
+                    </FormErrorMessage>
+                  )}
+                </FormHelperText>
+              </FormControl>
+
+              <HStack>
+                <Button
+                  onClick={formik.handleSubmit}
+                  isLoading={walletAddress.post.loading}
+                  type="submit"
+                  size="sm"
+                  bgGradient="linear(to-bl, #594bab,#4d2c58)"
+                  color="white"
+                  _hover={{ bgGradient: "linear(to-bl, #ada1ed,#8e55a1)" }}
+                >
+                  Save Address
+                </Button>
+                {/* <Button
+              size="sm"
+              onClick={() => connectWallet()}
+              bgGradient="linear(to-bl, #594bab,#4d2c58)"
+              _hover={{ bgGradient: "linear(to-bl, #ada1ed,#8e55a1)" }}
+              color="white"
+            >
+              Connect to XLM Wallet
+            </Button> */}
+              </HStack>
+            </>
+          ) : ("")}
         </Box>
       );
     }
