@@ -19,8 +19,9 @@ import {
 } from "@chakra-ui/react";
 import { useContext, useEffect } from "react";
 import NavBar from "../../components/navbar";
-import { ShopContext } from "../../context";
+import { ShopContext, StellarHorizonAPIContext, } from "../../context";
 import useTransactionStore from "../../store/transaction";
+import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 
 
 const TransactionRoute = () => {
@@ -30,6 +31,8 @@ const TransactionRoute = () => {
   blockChain = blockChainObj?.blockChain;
 
   const shop = useContext(ShopContext);
+  const stellarHorizonAPI = useContext(StellarHorizonAPIContext);
+
   const transactionState = useTransactionStore(
     (state) => state.transactionState);
   const getTransactionState = useTransactionStore(
@@ -37,10 +40,12 @@ const TransactionRoute = () => {
   );
 
   useEffect(async () => {
-    getTransactionState(shop);
+    getTransactionState(shop, stellarHorizonAPI);
   }, []);
 
-  if (transactionState.get.success?.data?.length === 0) {
+  console.log(transactionState.get.success, "data")
+
+  if (transactionState.get.loading) {
     return (
       <>
         <NavBar />
@@ -90,6 +95,7 @@ const TransactionRoute = () => {
                   {blockChain === "hedera" ? "HABR Transaction Details" : ""}
                   {blockChain === "ripple" ? "XRP Transaction Details" : ""}
                   {blockChain === "near" ? "NEAR Transaction Details" : ""}
+                  {blockChain === "stellar" ? "XLM Transaction Details" : ""}
                 </Text>
                 <Divider borderColor="gray.200" />
               </Box>
@@ -98,13 +104,22 @@ const TransactionRoute = () => {
             <TableContainer p="5">
               <Table variant={"simple"}>
                 <Thead>
-                  <Tr>
-                    <Th>Account</Th>
-                    {/* <Th isNumeric>Amount</Th> */}
-                    <Th>Fee</Th>
-                    <Th>Result</Th>
-                    <Th>Transaction Ref</Th>
-                  </Tr>
+                  {blockChain === "stellar" ?
+                    <Tr>
+                      <Th>Amount</Th>
+                      <Th>Date</Th>
+                      <Th>From</Th>
+                      <Th>Status</Th>
+                      <Th>Transaction</Th>
+                    </Tr>
+                    :
+                    <Tr>
+                      <Th>Account</Th>
+                      {/* <Th isNumeric>Amount</Th> */}
+                      <Th>Fee</Th>
+                      <Th>Result</Th>
+                      <Th>Transaction Ref</Th>
+                    </Tr>}
                 </Thead>
                 {blockChain === "hedera" ? (
                   <Tbody>
@@ -170,6 +185,41 @@ const TransactionRoute = () => {
                 ) : (
                   ""
                 )}
+                {blockChain === 'stellar' ?
+                  <Tbody>
+                    {transactionState.get.success?.data?.records?.map((record) => (
+                      <Tr key={record.transaction_hash}>
+                        <Td>{parseFloat(record?.amount)?.toFixed(2)}</Td>
+                        <Td>
+                          {new Date(record.created_at).toLocaleTimeString()}{" "}
+                          {new Date(record.created_at).toLocaleDateString()}
+                        </Td>
+                        <Td isTruncated maxW={100}>
+                          {record.from}
+                        </Td>
+                        <Td>
+                          {record.transaction_successful ? (
+                            <CheckIcon color="green" />
+                          ) : (
+                            <CloseIcon color="red" />
+                          )}
+                        </Td>
+                        <Td isTruncated>
+                          <Link
+                            color="teal"
+                            target="_blank"
+                            href={`${process.env.REACT_APP_STELLAR_LEDGER_EXPLORER}transactions/${record.transaction_hash}`}
+                          >
+                            <Text overflow="ellipsis" noOfLines={1} as="u">
+                              {record.transaction_hash}
+                            </Text>
+                          </Link>
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                  :
+                  ""}
               </Table>
             </TableContainer>
             {blockChain === "near" ?

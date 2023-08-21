@@ -10,7 +10,7 @@ function App() {
 
   //-------------- Setting the Blockchain network -----------//
 
-  const blockChainNetwork = { blockChain: "near" }
+  const blockChainNetwork = { blockChain: "stellar" }
   localStorage.setItem('blockchain', JSON.stringify(blockChainNetwork));
 
   //-------------- Default Blockchain network is set to HEDERA -----------//

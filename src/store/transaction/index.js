@@ -3,6 +3,7 @@ import axios from "axios";
 import produce from "immer";
 import { INTERNAL_SERVER_ERROR } from "../../constants/strings";
 import { Client } from "xrpl";
+import StellarSdk from "stellar-sdk";
 
 let blockChain;
 const retrievedObject = localStorage.getItem('blockchain');
@@ -36,7 +37,7 @@ const INITIAL_TRANSACTION_STATE = {
 
 const useTransactionStore = create((set) => ({
   transactionState: INITIAL_TRANSACTION_STATE,
-  getTransactionState: async (shop) => {
+  getTransactionState: async (shop, stellarHorizonAPI) => {
     set(
       produce((state) => ({
         ...state,
@@ -72,6 +73,14 @@ const useTransactionStore = create((set) => ({
           command: "account_tx",
           account: walletAddress,
         });
+      }
+      // ----------------------- Stellar --------------------- //
+      else if (blockChain === 'stellar') {
+        console.log(stellarHorizonAPI, "API")
+        const server = new StellarSdk.Server('https://horizon-testnet.stellar.org');
+        const payments = server.payments().forAccount(walletAddress);
+        const paymentRecords = await payments.call();
+        response = paymentRecords;
       }
 
 

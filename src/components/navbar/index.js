@@ -181,6 +181,12 @@ const DesktopNav = () => {
           src="https://seeklogo.com/images/N/near-protocol-near-logo-3CBD263358-seeklogo.com.png" /> :
         ""
       }
+      {blockchain === 'stellar' ?
+        <Image
+          height="32px"
+          src="https://assets-global.website-files.com/5dee83171c0040227763490c/5df16d8f13f4cced330e587b_stellar-logo-solo-1.png" /> :
+        ""
+      }
 
     </Stack>
   );

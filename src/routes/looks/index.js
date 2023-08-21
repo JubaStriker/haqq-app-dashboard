@@ -177,7 +177,7 @@ export const renderLooks = ({ looks, orangeColorMode, getLooks }) => {
       </Box>
     );
   } else if (looks.get.success.data.length) {
-    console.log(looks.get.success.data, "ERROR");
+
     return looks?.get?.success?.data?.map((look) => (
       <Box key={look.objectId}>
         <Box
@@ -291,7 +291,7 @@ function Looks(props) {
       } else {
         postViews({ shop, subscribed: false });
       }
-    } catch (e) {}
+    } catch (e) { }
   };
   useEffect(async () => {
     getLooks();
