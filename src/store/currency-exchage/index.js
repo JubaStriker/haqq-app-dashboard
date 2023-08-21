@@ -61,7 +61,7 @@ const useCurrencyExchangeStore = create((set) => ({
                 )
             }
             else if (blockChain === 'ripple') {
-                const response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=usd&vs_currencies=xrp')
+                response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=usd&vs_currencies=xrp')
                 // console.log(response);
                 set(
                     produce((state) => ({
@@ -97,6 +97,32 @@ const useCurrencyExchangeStore = create((set) => ({
                         }
                     }))
                 )
+            }
+            else if (blockChain === 'stellar') {
+                const { data = {} } = await axios.get(
+                    "https://api.coinconvert.net/convert/usd/xlm?amount=1"
+                );
+                if (data.status === "success") {
+                    set(
+                        produce((state) => ({
+                            ...state,
+                            currencyExchangeState: {
+                                ...state.currencyExchangeState,
+                                get: {
+                                    ...INITIAL_CURRENCY_EXCHANGE_SATAE.get,
+                                    success: {
+                                        ok: true,
+                                        data: data.XLM,
+                                    },
+                                },
+                            },
+                        }))
+                    );
+                    return data.XLM;
+                } else {
+                    throw new Error("Please try again");
+                }
+
             }
             return response;
         } catch (e) {

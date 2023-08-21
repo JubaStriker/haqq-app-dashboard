@@ -9,16 +9,13 @@ import {
   Input,
   Button,
   SimpleGrid,
-  useBreakpointValue,
   FormControl,
   FormLabel,
   Icon,
-  StackDivider,
   useColorModeValue,
   Image,
   useDisclosure,
   chakra,
-  toast,
   useToast,
   Avatar,
   AvatarGroup,
@@ -31,20 +28,14 @@ import {
   ButtonGroup,
   InputGroup,
   InputLeftAddon,
-  Grid,
-  GridItem,
   TableContainer,
   Table,
   Tbody,
   Tr,
   Td,
-  TableCaption,
   Thead,
   Th,
-  Tfoot,
   FormHelperText,
-  Alert,
-  AlertIcon,
   InputRightAddon,
   Spinner,
 } from "@chakra-ui/react";
@@ -128,10 +119,11 @@ function CreateLooks(props) {
   const [looksPrice, setLooksPrice] = useState(props.looks.price);
   const [lookHbarPrice, setLookHbarPrice] = useState();
   const [lookXrpPrice, setLookXrpPrice] = useState();
+  const [lookXlmPrice, setLookXlmPrice] = useState();
   const [lookNearPrice, setLookNearPrice] = useState();
   const [uploads, setUploads] = useState(props.looks.files || []);
   const [products, setProducts] = useState(props.looks.products || []);
-  const [exchangeRate, setExchageRate] = useState();
+
 
 
   useEffect(() => {
@@ -171,6 +163,16 @@ function CreateLooks(props) {
       setLookNearPrice(
         (currencyExchangeState.get.success.data * data).toFixed(2)
       );
+    }
+    else if (blockChain === 'stellar') {
+      setLookXlmPrice(
+        (currencyExchangeState?.get?.success?.data * data).toFixed(2)
+      );
+    } else {
+      toast({
+        title: "Could not fetch prices. Please try again ",
+        status: "error",
+      });
     }
   };
 
@@ -387,6 +389,11 @@ function CreateLooks(props) {
                   Items in this curation can be bought by paying with NEAR
                 </Heading>
                 : ""}
+              {blockChain === 'stellar' ?
+                <Heading size="sm">
+                  Items in this curation can be bought by paying with XLM/USDC
+                </Heading>
+                : ""}
 
             </Stack>
             <Box mt={10}>
@@ -404,6 +411,7 @@ function CreateLooks(props) {
                         lookHbarPrice,
                         lookXrpPrice,
                         lookNearPrice,
+                        lookXlmPrice,
                         cryptoReceiver: walletAddress?.get?.success?.data?.walletAddress
                       });
                     } else {
@@ -415,6 +423,7 @@ function CreateLooks(props) {
                         lookHbarPrice,
                         lookXrpPrice,
                         lookNearPrice,
+                        lookXlmPrice,
                         cryptoReceiver: walletAddress?.get?.success?.data?.walletAddress,
                       });
                       try {
@@ -589,6 +598,15 @@ function CreateLooks(props) {
                           )}
                         </InputRightAddon>
                         : ""}
+                      {blockChain === 'stellar' ?
+                        <InputRightAddon w={"50%"}>
+                          {currencyExchangeState.get.loading ? (
+                            <Spinner />
+                          ) : (
+                            `${lookXlmPrice ? lookXlmPrice : "0"} XLM`
+                          )}
+                        </InputRightAddon>
+                        : ""}
 
 
                     </InputGroup>
@@ -609,6 +627,13 @@ function CreateLooks(props) {
                     {blockChain === 'near' ?
                       <FormHelperText>
                         The total number of NEAR tokens a customer has to pay to shop all
+                        of the above products in this curation. Please add a
+                        discounted price to encourage community.
+                      </FormHelperText>
+                      : ""}
+                    {blockChain === 'stellar' ?
+                      <FormHelperText>
+                        The total number of XLM a customer has to pay to shop all
                         of the above products in this curation. Please add a
                         discounted price to encourage community.
                       </FormHelperText>
