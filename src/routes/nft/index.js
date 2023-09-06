@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import NavBar from "../../components/navbar";
 import useNFTStore from "../../store/nft";
 import { Box, Button, Center, Container, Flex, Grid, GridItem, Heading, Image, Input, SkeletonText, Stack, StackDivider, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useToast } from '@chakra-ui/react';
@@ -8,7 +8,11 @@ import Loading from '../../components/loader';
 import axios from 'axios';
 
 
+
 const NFTRoute = () => {
+
+    const [image, setImage] = useState(null);
+    const inputRef = useRef(null);
 
     const [allOrders, setAllOrders] = useState([])
     const [allNfts, setAllNfts] = useState(undefined)
@@ -19,11 +23,11 @@ const NFTRoute = () => {
     const storeNft = useNFTStore((state) => state.storeNft);
     const selectNft = useNFTStore((state) => state.selectNft);
 
-    useEffect(() => {
-        fetch(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/get_orders?shop=${shop}`)
-            .then(res => res.json())
-            .then(data => setAllOrders(data));
-    }, [shop])
+    // useEffect(() => {
+    //     fetch(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/get_orders?shop=${shop}`)
+    //         .then(res => res.json())
+    //         .then(data => setAllOrders(data));
+    // }, [shop])
 
     console.log(allOrders)
 
@@ -42,7 +46,16 @@ const NFTRoute = () => {
 
 
     const toast = useToast();
-    const imageHostKey = process.env.REACT_APP_IMAGE_BB_KEY
+    const imageHostKey = process.env.REACT_APP_IMAGE_BB_KEY;
+
+    const handleImageClick = () => {
+        inputRef.current.click();
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        setImage(file)
+    }
 
 
     const handleCreateBadge = (event) => {
@@ -50,7 +63,6 @@ const NFTRoute = () => {
         const form = event.target;
         const title = form.title.value;
         const description = form.description.value;
-        const image = form.image.files[0];
         const formData = new FormData();
         formData.append('image', image);
         const url = `https://api.imgbb.com/1/upload?key=${imageHostKey}`;
@@ -163,39 +175,95 @@ const NFTRoute = () => {
 
                                     </Text> : ""}
 
+                                <form onSubmit={handleCreateBadge}>
+
+                                    <Flex justifyContent={"center"} alignItems={"center"} mt='24px' gap={'10'}>
+                                        {nftState.badge.success.ok || nftState.post.success.ok ? "" :
+                                            <Box width={'50%'}>
+                                                <Text mb='4px' mt={'8px'} size="xl" fontWeight="bold" >Title of your NFT badge</Text>
+                                                <Input
+                                                    name='title'
+                                                    placeholder='Title of your NFT badge'
+                                                    size='sm'
+                                                    required={true}
+                                                />
+                                                <Text mb='4px' mt={'8px'} size="xl" fontWeight="bold" >Description</Text>
+                                                <Textarea name="description" placeholder='Description of your NFT badge' />
+
+                                            </Box>}
+                                        <Box>
+                                            {nftState.badge.success.ok || nftState.post.success.ok ?
+
+                                                <Box>
+
+                                                    <Heading fontSize={'large'} textAlign={'center'} my='16px'>
+
+                                                        {nftState.post.success.ok ?
+                                                            "Save your NFT badge" : "Your Created Badge"}
+                                                    </Heading>
+                                                    <Center >
+                                                        <Image
+                                                            borderRadius='xl'
+                                                            boxSize='200px'
+                                                            src={nftState.badge.success.data.image}
+                                                            alt='Badge Image'
+                                                        />
+                                                    </Center>
+                                                    <Center >
+                                                        <Text>{nftState.badge.success.data.name}</Text>
+                                                    </Center>
+                                                    <Center>
+
+                                                        {nftState.post.success.ok ?
+                                                            <Button isLoading={nftState.storeNft.loading} colorScheme={"messenger"} variant='solid' mt={'10px'}
+                                                                onClick={saveNft}
+                                                                isDisabled={nftState.storeNft.success.ok}>
+                                                                Save NFT Badge
+                                                            </Button> :
+                                                            <Button isLoading={nftState.post.loading} colorScheme={"messenger"} variant='solid' mt={'10px'} isDisabled={nftState.post.success.ok}
+                                                                onClick={handleCreateNFT}>
+                                                                Create NFT with your badge
+                                                            </Button>}
 
 
-                                <Flex justifyContent={"space-between"} alignItems={"center"} mt='24px'>
-                                    <Box width={"50%"}>
-                                        <form onSubmit={handleCreateBadge}>
+                                                    </Center>
+                                                </Box>
 
-                                            <Text mb='4px' mt={'8px'} size="xl" fontWeight="bold" >Title of your NFT badge</Text>
-                                            <Input
-                                                name='title'
-                                                placeholder='Title of your NFT badge'
-                                                size='sm'
-                                                required={true}
-                                            />
-                                            <Text mb='4px' mt={'8px'} size="xl" fontWeight="bold" >Description</Text>
-                                            <Textarea name="description" placeholder='Description of your NFT badge' />
-                                            <Text mb='4px' mt={'8px'} size="xl" fontWeight="bold" >Image</Text>
-                                            <Input
-                                                type='file'
-                                                px='4'
-                                                name='image'
-                                                placeholder='Title of your NFT badge'
-                                                size='sm'
-                                                required={true}
-                                            />
-                                            <Text mb='4px' ml='4' size="xl" textColor={'gray.400'} >Choose an eye catchy image to make your customer feel special</Text>
+                                                : <>
+                                                    <Text mb='4px' mt={'8px'} size="xl" fontWeight="bold" >Upload Badge Image</Text>
 
-                                            <Button isLoading={nftState.badge.loading} type='submit' colorScheme={"messenger"} variant='solid' mt={'10px'}
-                                                disabled={nftState.badge.success.ok}>
-                                                {nftState.badge.loading ? "Loading" : "Create Badge"}
-                                            </Button>
-                                        </form>
-                                    </Box>
-                                    {nftState.badge.success.ok || nftState.post.success.ok ?
+                                                    <div onClick={handleImageClick} style={{ cursor: 'pointer' }}>
+
+                                                        {image ? (<Image
+                                                            borderRadius='xl'
+                                                            boxSize='200px'
+                                                            src={URL.createObjectURL(image)} alt='' />) :
+                                                            (<Image
+                                                                borderRadius='xl'
+                                                                boxSize='200px'
+                                                                src="https://s3.amazonaws.com/ionic-marketplace/image-upload/icon.png" alt='nft badge' />)}
+                                                        <Input
+                                                            type='file'
+                                                            px='4'
+                                                            name='image'
+                                                            size='sm'
+                                                            required={true}
+                                                            ref={inputRef}
+                                                            onChange={handleImageChange}
+                                                            style={{ display: 'none' }}
+                                                        />
+                                                    </div>
+                                                    <Text mb='4px' ml='4' size="xl" textColor={'gray.400'} >Choose an eye catchy image to make your customer feel special</Text>
+
+                                                    <Button isLoading={nftState.badge.loading} type='submit' colorScheme={"messenger"} variant='solid' mt={'10px'}
+                                                        disabled={nftState.badge.success.ok}>
+                                                        {nftState.badge.loading ? "Loading" : "Create Badge"}
+                                                    </Button>
+                                                </>}
+                                        </Box>
+
+
+                                        {/* {nftState.badge.success.ok || nftState.post.success.ok ?
                                         <Box width={"50%"}>
 
                                             <Heading fontSize={'large'} textAlign={'center'} my='16px'>
@@ -229,9 +297,10 @@ const NFTRoute = () => {
 
 
                                             </Center>
-                                        </Box> : ""}
+                                        </Box> : ""} */}
 
-                                </Flex>
+                                    </Flex>
+                                </form>
                             </Box>
 
 
