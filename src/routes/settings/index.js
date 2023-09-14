@@ -24,7 +24,6 @@ import {
   FormLabel,
 } from "@chakra-ui/react";
 import Blur from "../../components/blur";
-
 import useScriptsStore from "../../store/scripts";
 import { ShopContext } from "../../context";
 import { INTERNAL_SERVER_ERROR } from "../../constants/strings";
@@ -49,7 +48,6 @@ const SettingsRoute = () => {
   const toast = useToast();
 
   const verifyWalletSate = useWalletStore((state) => state.verifyWalletSate);
-
   const walletAddress = useWalletStore((state) => state.walletState);
   const getWalletAddress = useWalletStore((state) => state.getWalletAddress);
   const postWalletAddress = useWalletStore((state) => state.postWalletAddress);
@@ -57,12 +55,13 @@ const SettingsRoute = () => {
   const verifyWalletAddress = useWalletStore(
     (state) => state.verifyWalletAddress
   );
-  console.log("Wallet address", walletAddress?.get?.success?.data);
+
+
 
   const onSubmitHandler = async (data) => {
     // ----------------- Hedera ----------------- //
     if (blockChain === "hedera") {
-      console.log(data);
+
       const { walletAddress, walletToken } = data;
       await verifyWalletAddress(walletAddress);
       console.log(verifyWalletSate.get.success.ok);

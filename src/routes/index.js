@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import {
 	Routes,
 	Route,
@@ -18,7 +18,6 @@ import EmbedInstructions from './embed-insturctions';
 import NFTRoute from './nft';
 
 const AppRoutes = (props) => {
-
 
 	return (
 		<>

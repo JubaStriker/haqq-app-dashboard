@@ -4,10 +4,12 @@ import produce from "immer";
 import { HashConnect } from "hashconnect";
 import { PublicKey, TokenCreateTransaction } from "@hashgraph/sdk";
 
+
 let blockchain;
 const retrievedObject = localStorage.getItem('blockchain');
 const blockChainObj = JSON.parse(retrievedObject);
 blockchain = blockChainObj?.blockChain;
+
 
 const VERIFY_WALLET_STATE = {
   get: {

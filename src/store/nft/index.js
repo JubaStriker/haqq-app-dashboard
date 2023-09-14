@@ -167,8 +167,7 @@ const useNFTStore = create((set) => ({
                     }))
                 );
             }
-
-            ;
+            return data;
         } catch (e) {
             console.error(e);
             throw e;

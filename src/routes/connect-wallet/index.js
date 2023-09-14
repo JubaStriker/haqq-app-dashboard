@@ -5,7 +5,14 @@ import { ShopContext } from "../../context";
 import useWalletStore from "../../store/wallet";
 
 const ConnectWallet = () => {
-  const shop = useContext(ShopContext);
+
+  let shop;
+  const retrievedObject = localStorage.getItem('shop');
+  const shopObj = JSON.parse(retrievedObject);
+  shop = shopObj?.shop;
+
+  console.log(shop);
+
   const walletState = useWalletStore((state) => state.walletState);
   const getHABRWalletConnect = useWalletStore(
     (state) => state.getHABRWalletConnect
@@ -36,7 +43,7 @@ const ConnectWallet = () => {
 
   const backToAdmin = () => {
     window.open(
-      "https://jithu-demo.myshopify.com/admin/apps/dev-hedera",
+      `https://${shop}/admin/apps/dev-hbar-shop`,
       "_blank",
       "noopener,noreferrer"
     );

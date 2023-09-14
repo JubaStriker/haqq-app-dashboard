@@ -16,7 +16,7 @@ const NFTRoute = () => {
 
     const [allOrders, setAllOrders] = useState([])
     const [allNfts, setAllNfts] = useState(undefined)
-    const shop = window.lookbook.shop
+    const shop = window.lookbook.shop;
     const nftState = useNFTStore((state) => state.nftState);
     const postNFTState = useNFTStore((state) => state.postNFTState);
     const postNFTBadge = useNFTStore((state) => state.postNFTBadge);
@@ -80,22 +80,20 @@ const NFTRoute = () => {
 
     }
 
-    const handleCreateNFT = () => {
-
+    const handleCreateNFT = async () => {
         const seed = process.env.REACT_APP_XRP_NFT_ACCOUNT_SEED;
         const uri = `${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/badge_nft?id=${nftState.badge.success.data.objectId}`;
         const transferFee = 1;
         const flags = 8;
-        postNFTState(seed, uri, transferFee, flags);
+        const result = await postNFTState(seed, uri, transferFee, flags);
+        if (result) {
+            toast({
+                title: "NFT created successfully",
+                status: "success",
+            });
+        }
     }
 
-
-    if (nftState.post.success.ok && !nftState.storeNft.success.ok) {
-        toast({
-            title: "NFT created successfully",
-            status: "success",
-        });
-    }
 
 
     let length = 0;
@@ -262,42 +260,6 @@ const NFTRoute = () => {
                                                 </>}
                                         </Box>
 
-
-                                        {/* {nftState.badge.success.ok || nftState.post.success.ok ?
-                                        <Box width={"50%"}>
-
-                                            <Heading fontSize={'large'} textAlign={'center'} my='16px'>
-
-                                                {nftState.post.success.ok ?
-                                                    "Save your NFT badge" : "Your Created Badge"}
-                                            </Heading>
-                                            <Center >
-                                                <Image
-                                                    borderRadius='3xl'
-                                                    boxSize='150px'
-                                                    src={nftState.badge.success.data.image}
-                                                    alt='Badge Image'
-                                                />
-                                            </Center>
-                                            <Center >
-                                                <Text>{nftState.badge.success.data.name}</Text>
-                                            </Center>
-                                            <Center>
-
-                                                {nftState.post.success.ok ?
-                                                    <Button isLoading={nftState.storeNft.loading} colorScheme={"messenger"} variant='solid' mt={'10px'}
-                                                        onClick={saveNft}
-                                                        isDisabled={nftState.storeNft.success.ok}>
-                                                        Save NFT Badge
-                                                    </Button> :
-                                                    <Button isLoading={nftState.post.loading} colorScheme={"messenger"} variant='solid' mt={'10px'} isDisabled={nftState.post.success.ok}
-                                                        onClick={handleCreateNFT}>
-                                                        Create NFT with your badge
-                                                    </Button>}
-
-
-                                            </Center>
-                                        </Box> : ""} */}
 
                                     </Flex>
                                 </form>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Flex, Skeleton, Box, Container, Text } from "@chakra-ui/react";
 import { Navigate } from "react-router-dom";
 import NavBar from "./components/navbar";
@@ -6,12 +6,18 @@ import LooksRoute from "./routes/looks";
 import { parseQuery } from "./utils/url";
 import Authorize from "./routes/shopify/Authorize";
 import Parse from "parse";
+import { ShopContext } from "./context";
 function App() {
 
   //-------------- Setting the Blockchain network -----------//
 
-  const blockChainNetwork = { blockChain: "ripple" }
+  const blockChainNetwork = { blockChain: "hedera" }
   localStorage.setItem('blockchain', JSON.stringify(blockChainNetwork));
+
+  const shop = useContext(ShopContext)
+  const shopName = { shop: shop }
+  localStorage.setItem('shop', JSON.stringify(shopName));
+
 
   //-------------- Default Blockchain network is set to HEDERA -----------//
 
