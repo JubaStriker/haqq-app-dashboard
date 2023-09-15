@@ -14,6 +14,7 @@ const ConnectWallet = () => {
   console.log(shop);
 
   const walletState = useWalletStore((state) => state.walletState);
+  const postWalletAddress = useWalletStore((state) => state.postWalletAddress);
   const getHABRWalletConnect = useWalletStore(
     (state) => state.getHABRWalletConnect
   );
@@ -27,9 +28,19 @@ const ConnectWallet = () => {
   //   getHABRWalletConnect();
   // }, []);
 
-  const connectWalletHandler = () => {
-    getHABRWalletConnect();
+  let walletId;
+
+  const connectWalletHandler = async () => {
+    const data = await getHABRWalletConnect();
+    console.log(data, "DATA");
   };
+
+  // if (walletState.get.success.ok) {
+  //   walletId = walletState.get.success.data.accountId;
+  //   console.log("wallet id: " + walletId);
+  //   // postWalletAddress({ shop, walletAddress: walletId, });
+
+  // }
 
   const createTokenHandler = () => {
     const { accountId, network, topic } = walletState.get.success.data;

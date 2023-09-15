@@ -241,6 +241,7 @@ const useWalletStore = create((set, address) => ({
       }))
     );
     try {
+      let walletAccountID = "";
       const appMetaData = {
         name: "Hbar Shopify App",
         description: "Hedera Token Creation",
@@ -255,13 +256,16 @@ const useWalletStore = create((set, address) => ({
           walletMetadata
         );
       });
-      let walletAccountID = "";
+
       hashconnect.pairingEvent.once((pairingData) => {
         console.log(pairingData);
         pairingData.accountIds.forEach((id) => {
           walletAccountID = id;
         });
-        console.log("wallet ID: ", walletAccountID);
+
+
+        console.log("wallet ID: 1", walletAccountID);
+
         set(
           produce((state) => ({
             ...state,
@@ -282,7 +286,11 @@ const useWalletStore = create((set, address) => ({
             },
           }))
         );
+
       });
+
+      return initData;
+
     } catch (e) {
       set(
         produce((state) => ({
