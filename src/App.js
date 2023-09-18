@@ -5,7 +5,6 @@ import NavBar from "./components/navbar";
 import LooksRoute from "./routes/looks";
 import { parseQuery } from "./utils/url";
 import Authorize from "./routes/shopify/Authorize";
-import Parse from "parse";
 import { ShopContext } from "./context";
 function App() {
 
