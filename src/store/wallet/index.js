@@ -9,6 +9,10 @@ let blockchain;
 const retrievedObject = localStorage.getItem('blockchain');
 const blockChainObj = JSON.parse(retrievedObject);
 blockchain = blockChainObj?.blockChain;
+let shop;
+const retrievedShopObject = localStorage.getItem('shop');
+const shopObj = JSON.parse(retrievedShopObject);
+shop = shopObj?.shop;
 
 
 const VERIFY_WALLET_STATE = {
@@ -261,35 +265,42 @@ const useWalletStore = create((set, address) => ({
         console.log(pairingData);
         pairingData.accountIds.forEach((id) => {
           walletAccountID = id;
-        });
 
-
-        console.log("wallet ID: 1", walletAccountID);
-
-        set(
-          produce((state) => ({
-            ...state,
-            walletState: {
-              ...state.walletState,
-              get: {
-                ...INITIAL_WALLET_STATE.get,
-                loading: false,
-                success: {
-                  data: {
-                    topic: pairingData.topic,
-                    accountId: walletAccountID,
-                    network: pairingData.network,
+          fetch(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/put_shop`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              shop,
+              walletAddress: walletAccountID
+            }),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              console.log('Response', data);
+              set(
+                produce((state) => ({
+                  ...state,
+                  walletState: {
+                    ...state.walletState,
+                    get: {
+                      ...INITIAL_WALLET_STATE.get,
+                      loading: false,
+                      success: {
+                        data: {
+                          topic: pairingData.topic,
+                          accountId: walletAccountID,
+                          network: pairingData.network,
+                        },
+                        ok: true,
+                      },
+                    },
                   },
-                  ok: true,
-                },
-              },
-            },
-          }))
-        );
-
+                }))
+              );
+            })
+        });
       });
 
-      return initData;
 
     } catch (e) {
       set(

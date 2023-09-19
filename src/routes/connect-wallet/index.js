@@ -1,5 +1,5 @@
-import { Flex, Box, VStack, Button } from "@chakra-ui/react";
-import { useContext } from "react";
+import { Flex, Box, VStack, Button, useToast } from "@chakra-ui/react";
+import { useContext, useEffect } from "react";
 import { ShopContext } from "../../context";
 
 import useWalletStore from "../../store/wallet";
@@ -11,10 +11,8 @@ const ConnectWallet = () => {
   const shopObj = JSON.parse(retrievedObject);
   shop = shopObj?.shop;
 
-  console.log(shop);
-
+  const toast = useToast();
   const walletState = useWalletStore((state) => state.walletState);
-  const postWalletAddress = useWalletStore((state) => state.postWalletAddress);
   const getHABRWalletConnect = useWalletStore(
     (state) => state.getHABRWalletConnect
   );
@@ -23,17 +21,26 @@ const ConnectWallet = () => {
 
   const getHbarTokenId = useWalletStore((state) => state.getHbarTokenId);
 
-  console.log(walletState.get);
+
   // useEffect(() => {
   //   getHABRWalletConnect();
   // }, []);
 
-  let walletId;
-
   const connectWalletHandler = async () => {
     const data = await getHABRWalletConnect();
-    console.log(data, "DATA");
   };
+
+  useEffect(() => {
+    if (walletState.get.success.ok) {
+      console.log(walletState.get);
+      toast({
+        title: "Wallet Connected",
+        status: "success",
+      });
+    }
+  }, [walletState.get.success.ok]);
+
+
 
   // if (walletState.get.success.ok) {
   //   walletId = walletState.get.success.data.accountId;
