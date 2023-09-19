@@ -271,7 +271,8 @@ const useWalletStore = create((set, address) => ({
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               shop,
-              walletAddress: walletAccountID
+              walletAddress: walletAccountID,
+              blockchain
             }),
           })
             .then((res) => res.json())
@@ -414,7 +415,6 @@ const useWalletStore = create((set, address) => ({
   getHbarTokenId: async ({
     accountId,
     transId,
-    shop = "jithu-demo.myshopify.com",
   }) => {
     set(
       produce((state) => ({
@@ -429,7 +429,7 @@ const useWalletStore = create((set, address) => ({
       }))
     );
     try {
-      console.log(accountId, transId);
+
       const transactionResponse = await fetch(
         "https://testnet.mirrornode.hedera.com/api/v1/transactions/" + transId
       );
@@ -437,6 +437,7 @@ const useWalletStore = create((set, address) => ({
       const resp = await transactionResponse.json();
       console.log("Transaction Response: ", resp);
       const generatedId = resp.transactions[0].entity_id;
+      console.log(accountId, transId);
       console.log("Token ID: ", generatedId);
 
       const { data } = await axios.post(
@@ -445,8 +446,11 @@ const useWalletStore = create((set, address) => ({
           shop,
           walletAddress: accountId,
           walletToken: generatedId,
+          blockchain
         }
       );
+
+      console.log(data)
 
       set(
         produce((state) => ({

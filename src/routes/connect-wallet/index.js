@@ -31,14 +31,14 @@ const ConnectWallet = () => {
   };
 
   useEffect(() => {
-    if (walletState.get.success.ok) {
+    if (walletState.get?.success?.ok) {
       console.log(walletState.get);
       toast({
         title: "Wallet Connected",
         status: "success",
       });
     }
-  }, [walletState.get.success.ok]);
+  }, [walletState.get]);
 
 
 
@@ -106,7 +106,7 @@ const ConnectWallet = () => {
                 _hover={{ bgGradient: "linear(to-bl, #ada1ed,#8e55a1)" }}
                 color="white"
               >
-                Get Generated Token
+                Save Generated Token
               </Button>
 
               <Button
