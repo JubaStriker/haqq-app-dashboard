@@ -34,7 +34,7 @@ const ConnectWallet = () => {
     if (walletState.get?.success?.ok) {
       console.log(walletState.get);
       toast({
-        title: "Wallet Connected",
+        title: "Success",
         status: "success",
       });
     }

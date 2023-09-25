@@ -90,11 +90,11 @@ const EmbedInstructions = () => {
               </Code>
             </ListItem>
             <ListItem>
-              <Text>Render the componet</Text>
+              <Text>Render the component</Text>
               <Code>
                 {`
                 <CryptoShop
-                    shop="jithendra-test-store.myshopify.com"
+                    shop="your-store.myshopify.com"
                     network="mainnet"
                 />
                 `}

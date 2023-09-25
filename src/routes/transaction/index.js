@@ -115,7 +115,7 @@ const TransactionRoute = () => {
                     :
                     <Tr>
                       <Th>Account</Th>
-                      {/* <Th isNumeric>Amount</Th> */}
+                      <Th isNumeric>Amount</Th>
                       <Th>Fee</Th>
                       <Th>Result</Th>
                       <Th>Transaction Ref</Th>
