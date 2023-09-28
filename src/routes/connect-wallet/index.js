@@ -1,6 +1,6 @@
 import { Flex, Box, VStack, Button, useToast } from "@chakra-ui/react";
-import { useContext, useEffect } from "react";
-import { ShopContext } from "../../context";
+import { useEffect } from "react";
+
 
 import useWalletStore from "../../store/wallet";
 

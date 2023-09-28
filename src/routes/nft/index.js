@@ -1,27 +1,35 @@
 import React, { useEffect, useState, useRef } from 'react';
 import NavBar from "../../components/navbar";
 import useNFTStore from "../../store/nft";
-import { Box, Button, Center, Container, Flex, Grid, GridItem, Heading, Image, Input, SkeletonText, Stack, StackDivider, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useToast } from '@chakra-ui/react';
-import { Tabs, TabList, TabPanels, Tab, TabPanel, Textarea } from '@chakra-ui/react'
+import { Alert, AlertDescription, AlertIcon, AlertTitle, Box, Button, Center, Container, Flex, Grid, GridItem, Heading, Image, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, SkeletonText, Spinner, Stack, StackDivider, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useDisclosure, useToast } from '@chakra-ui/react';
+import { Tabs, TabList, TabPanels, Tab, TabPanel, Textarea, Link } from '@chakra-ui/react'
 import SendNftModal from '../../components/sendNftModal';
 import Loading from '../../components/loader';
 import axios from 'axios';
+import useWalletStore from '../../store/wallet';
 
 
 
 const NFTRoute = () => {
 
+    let shop;
+    const retrievedObject = localStorage.getItem('shop');
+    const shopObj = JSON.parse(retrievedObject);
+    shop = shopObj?.shop;
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const [image, setImage] = useState(null);
     const inputRef = useRef(null);
-
     const [allOrders, setAllOrders] = useState([])
     const [allNfts, setAllNfts] = useState(undefined)
-    const shop = window.lookbook.shop;
+    const [nftId, setNftId] = useState('')
+    // const shop = window.lookbook.shop;
     const nftState = useNFTStore((state) => state.nftState);
     const postNFTState = useNFTStore((state) => state.postNFTState);
+    const getNFTState = useNFTStore((state) => state.getNFTState);
     const postNFTBadge = useNFTStore((state) => state.postNFTBadge);
     const storeNft = useNFTStore((state) => state.storeNft);
     const selectNft = useNFTStore((state) => state.selectNft);
+    const getWalletAddress = useWalletStore((state) => state.getWalletAddress);
 
     // useEffect(() => {
     //     fetch(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/get_orders?shop=${shop}`)
@@ -29,7 +37,7 @@ const NFTRoute = () => {
     //         .then(data => setAllOrders(data));
     // }, [shop])
 
-    console.log(allOrders)
+    // console.log(allOrders)
 
     useEffect(() => {
         const getNfts = async () => {
@@ -42,8 +50,6 @@ const NFTRoute = () => {
 
 
     let orders = allOrders.filter(order => order.discount_codes.length >= 0)
-
-
 
     const toast = useToast();
     const imageHostKey = process.env.REACT_APP_IMAGE_BB_KEY;
@@ -80,40 +86,103 @@ const NFTRoute = () => {
 
     }
 
-    const handleCreateNFT = async () => {
-        const seed = process.env.REACT_APP_XRP_NFT_ACCOUNT_SEED;
-        const uri = `${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/badge_nft?id=${nftState.badge.success.data.objectId}`;
-        const transferFee = 1;
-        const flags = 8;
-        const result = await postNFTState(seed, uri, transferFee, flags);
-        if (result) {
-            toast({
-                title: "NFT created successfully",
-                status: "success",
-            });
+    const renderNftStatus = () => {
+        if (nftState.post.loading) {
+            return (
+                <Box minH={"400px"} width="20%" m="auto" p={5}>
+                    <Spinner
+                        thickness="4px"
+                        speed="0.65s"
+                        emptyColor="gray.200"
+                        color="blue.500"
+                        size="xl"
+                    />
+                </Box>
+            )
+        }
+        else if (nftState.post.success.ok) {
+            return (
+                <Grid gap={6}>
+                    <GridItem alignContent={"center"}>
+                        <Center width={"100%"}>
+                            <Image
+                                border={"2px"}
+                                src={nftState.post.success?.data?.qr}
+                                width="200px"
+                            />
+                        </Center>
+                    </GridItem>
+                    <GridItem>
+                        <Center>
+                            <Text>
+                                Please scan the QR code with
+                            </Text>
+                            <Image src={"https://www.drupal.org/files/project-images/Screen%20Shot%202020-04-13%20at%2018.52.18.png"} width="90px" />
+                            <Text>
+                                on your smartphone.
+                            </Text>
+                        </Center>
+                    </GridItem>
+                </Grid>
+
+            )
         }
     }
 
 
 
-    let length = 0;
-    let token = ""
-    length = nftState?.post?.success?.data?.result?.account_nfts.length;
 
+    const handleCreateNFT = async () => {
+        onOpen();
+        const uri = `${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/badge_nft?id=${nftState.badge.success.data.objectId}`;
+        const accountDetails = await getWalletAddress(shop)
+        const account = accountDetails.walletAddress;
+        const result = await postNFTState(account, uri);
 
-    if (nftState?.post?.success?.data?.result?.account_nfts.length) {
-        token = nftState?.post?.success?.data?.result?.account_nfts[length - 1]
+        const client = new WebSocket(result.status);
+        client.onopen = () => {
+            console.log("Connected.....");
+        };
+        client.onmessage = async (e) => {
+            const newObj = await JSON.parse(e.data);
+
+            const txid = await newObj.txid;
+
+            if (txid !== undefined) {
+                getNFTState(txid);
+                onClose();
+                toast({
+                    title:
+                        "NFT created successfully ",
+                    status: "success",
+                });
+            }
+        };
     }
 
+    console.log(nftState.get)
+    useEffect(() => {
+        setNftId(nftState.get.success.data?.nftoken_id)
+    }, [nftState.get.success.data])
 
-    const saveNft = () => {
+
+
+    const saveNft = async () => {
         const title = nftState?.badge?.success?.data?.name;
         const image = nftState?.badge?.success?.data?.image;
         const description = nftState?.badge?.success?.data?.description;
-        const token = nftState?.post?.success?.data?.result?.account_nfts[length - 1].NFTokenID;
+        const token = nftState.get.success.data?.nftoken_id;
 
         if (token) {
-            storeNft(title, description, image, token)
+            const data = await storeNft(title, description, image, token);
+            if (data) {
+                toast({
+                    title:
+                        "NFT saved successfully",
+                    status: "success",
+                });
+            }
+
         }
     }
 
@@ -169,8 +238,7 @@ const NFTRoute = () => {
 
                                 {nftState.storeNft.success.ok ?
                                     <Text my='10px' fontWeight='semibold' fontSize={'xl'} textColor={'blue.600'}>
-                                        Step 4 - Go to the transfer tab from top and send the NFT badge to your customer.
-
+                                        Step 4 - Go to the select tab from top and send the NFT badge to your customer.
                                     </Text> : ""}
 
                                 <form onSubmit={handleCreateBadge}>
@@ -196,7 +264,7 @@ const NFTRoute = () => {
 
                                                     <Heading fontSize={'large'} textAlign={'center'} my='16px'>
 
-                                                        {nftState.post.success.ok ?
+                                                        {nftState.get.success.ok ?
                                                             "Save your NFT badge" : "Your Created Badge"}
                                                     </Heading>
                                                     <Center >
@@ -223,7 +291,25 @@ const NFTRoute = () => {
                                                                 Create NFT with your badge
                                                             </Button>}
 
+                                                        <Modal isOpen={isOpen} onClose={onClose} size="xl">
+                                                            <ModalOverlay />
+                                                            <ModalContent>
+                                                                <ModalHeader colorScheme="blue.500">
+                                                                    <Center>
+                                                                        <Text>
+                                                                            Open
+                                                                        </Text>
+                                                                        <Image src={"https://www.drupal.org/files/project-images/Screen%20Shot%202020-04-13%20at%2018.52.18.png"} width="90px" />
+                                                                        <Text>
+                                                                            App
+                                                                        </Text>
+                                                                    </Center>
 
+                                                                </ModalHeader>
+                                                                <ModalCloseButton />
+                                                                <ModalBody>{renderNftStatus()}</ModalBody>
+                                                            </ModalContent>
+                                                        </Modal>
                                                     </Center>
                                                 </Box>
 
@@ -239,7 +325,7 @@ const NFTRoute = () => {
                                                             (<Image
                                                                 borderRadius='xl'
                                                                 boxSize='200px'
-                                                                src="https://s3.amazonaws.com/ionic-marketplace/image-upload/icon.png" alt='nft badge' />)}
+                                                                src="https://png.pngtree.com/png-vector/20191129/ourmid/pngtree-image-upload-icon-photo-upload-icon-png-image_2047546.jpg" alt='nft badge' />)}
                                                         <Input
                                                             type='file'
                                                             px='4'
@@ -259,74 +345,36 @@ const NFTRoute = () => {
                                                     </Button>
                                                 </>}
                                         </Box>
-
-
                                     </Flex>
                                 </form>
                             </Box>
 
 
-                            {nftState.post.success.ok ? <Box bg="white" maxW="5xl" mx="auto" borderRadius={10} p={5} mt={'24px'} boxShadow="md">
-                                <Heading size='xs' mb={'20px'}>
-                                    Created tokens for account : {nftState.post.success.data?.result?.account}
-                                </Heading>
-                                <Stack divider={<StackDivider />} spacing='4'>
-
-                                    <Box key={token.NFTokenID}>
-                                        <Text pt='2' fontSize='sm'>
-                                            Serial :  {token.nft_serial}
+                            {nftState.post.success.ok ?
+                                <Alert
+                                    status={'success'}
+                                    variant="subtle"
+                                    flexDirection="column"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                    textAlign="center"
+                                    height="300px"
+                                    rounded="md"
+                                    boxShadow="2xl"
+                                    mt={'3'}
+                                >
+                                    <Heading size='xs' mb={'20px'} textAlign={'center'} fontSize={'2xl'}>
+                                        NFT created <Text as={'span'} color={'green.400'}>Successfully</Text>
+                                    </Heading>
+                                    <AlertIcon boxSize="40px" mr={0} />
+                                    <AlertDescription maxWidth="sm" mt={2}>
+                                        <Text fontStyle={"italic"} as='u' cursor={'pointer'} mt={'2'}>
+                                            <a href={`https://test.bithomp.com/nft/${nftId}`} target='_blank' rel="noreferrer">View your NFT on bithomp </a>
                                         </Text>
-                                        <Text pt='2' fontSize='sm'>
-                                            Issuer :  {token.Issuer}
-                                        </Text>
-                                        <Text pt='2' fontSize='sm'>
-                                            NFToken ID:  {token.NFTokenID}
-                                        </Text>
-                                        <Text pt='2' fontSize='sm'>
-                                            Flags :  {token.Flags}
-                                        </Text>
-                                        <Text pt='2' fontSize='sm'>
-                                            Transfer Fee :  {token.TransferFee}
-                                        </Text>
-                                        <Text pt='2' fontSize='sm'>
-                                            Token URI :  {token.URI}
-                                        </Text>
-                                    </Box>
+                                    </AlertDescription>
+                                </Alert>
 
-                                </Stack>
-                            </Box> : ""}
-
-
-
-                            {nftState.get.success.ok ? <Box bg="white" maxW="5xl" mx="auto" borderRadius={10} p={5} mt={'24px'} boxShadow="md">
-                                <Heading size='xs' mb={'20px'}>
-                                    Tokens for account : {nftState.get.success.data?.result?.account}
-                                </Heading>
-                                <Stack divider={<StackDivider />} spacing='4'>
-                                    {nftState.get.success.data?.result?.account_nfts?.map(nfts =>
-                                        <Box key={nfts.NFTokenID}>
-                                            <Text pt='2' fontSize='sm'>
-                                                Serial :  {nfts.nft_serial}
-                                            </Text>
-                                            <Text pt='2' fontSize='sm'>
-                                                Issuer :  {nfts.Issuer}
-                                            </Text>
-                                            <Text pt='2' fontSize='sm'>
-                                                NFToken ID:  {nfts.NFTokenID}
-                                            </Text>
-                                            <Text pt='2' fontSize='sm'>
-                                                Flags :  {nfts.Flags}
-                                            </Text>
-                                            <Text pt='2' fontSize='sm'>
-                                                Transfer Fee :  {nfts.TransferFee}
-                                            </Text>
-                                            <Text pt='2' fontSize='sm'>
-                                                Token URI :  {nfts.URI}
-                                            </Text>
-                                        </Box>)}
-
-                                </Stack>
-                            </Box> : ""}
+                                : ""}
                         </TabPanel>
 
                         <TabPanel>

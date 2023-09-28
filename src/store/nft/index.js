@@ -2,6 +2,7 @@ import create from "zustand";
 import axios from "axios";
 import produce from "immer";
 import { INTERNAL_SERVER_ERROR } from "../../constants/strings";
+const xrpl = require("xrpl");
 
 const INITIAL_NFT_STATE = {
     get: {
@@ -76,7 +77,7 @@ const INITIAL_NFT_STATE = {
 
 const useNFTStore = create((set) => ({
     nftState: INITIAL_NFT_STATE,
-    getNFTState: async (seed) => {
+    getNFTState: async (txid) => {
         set(
             produce((state) => ({
                 ...state,
@@ -91,17 +92,19 @@ const useNFTStore = create((set) => ({
         );
 
         try {
-            const body = {
-                seed: seed,
-                uri: "example.com",
-                transferFee: "8",
-                flags: "8",
-                method: "get"
-            };
 
-            const { data } = await axios.post(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/create_nft`, body)
+            const client = new xrpl.Client("wss://s.altnet.rippletest.net:51233")
+            await client.connect();
 
-            if (data?.type === 'response') {
+            const response = await client.request({
+                "id": 1,
+                "command": "tx",
+                "transaction": String(txid),
+                "binary": false
+            })
+            console.log(response.result.meta)
+
+            if (response) {
                 set(
                     produce((state) => ({
                         ...state,
@@ -112,19 +115,20 @@ const useNFTStore = create((set) => ({
                                 loading: false,
                                 success: {
                                     ok: true,
-                                    data: data,
+                                    data: response.result.meta,
                                 },
                             },
                         },
                     }))
                 );
             };
+            return response.result.meta;
         } catch (e) {
             console.error(e);
             throw e;
         }
     },
-    postNFTState: async (seed, uri, transferFee, flags) => {
+    postNFTState: async (account, uri) => {
         set(
             produce((state) => ({
                 ...state,
@@ -140,34 +144,32 @@ const useNFTStore = create((set) => ({
 
         try {
             const body = {
-                seed: seed,
+                account: account,
                 uri: uri,
-                transferFee: transferFee,
-                flags: flags,
                 method: "create"
             };
+            const { data } = await axios.post(
+                `http://localhost:8000/api/create_nft`, body
+            );
 
-            const { data } = await axios.post(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/create_nft`, body)
-
-            if (data?.type === 'response') {
-                set(
-                    produce((state) => ({
-                        ...state,
-                        nftState: {
-                            ...state.nftState,
-                            post: {
-                                ...INITIAL_NFT_STATE.post,
-                                loading: false,
-                                success: {
-                                    ok: true,
-                                    data: data,
-                                },
+            set(
+                produce((state) => ({
+                    ...state,
+                    nftState: {
+                        ...state.nftState,
+                        post: {
+                            ...INITIAL_NFT_STATE.post,
+                            loading: false,
+                            success: {
+                                ok: true,
+                                data: data,
                             },
                         },
-                    }))
-                );
-            }
+                    },
+                }))
+            );
             return data;
+
         } catch (e) {
             console.error(e);
             throw e;
@@ -269,11 +271,9 @@ const useNFTStore = create((set) => ({
                     }))
 
                 );
-
-                console.log("NFTS", data);
             }
 
-
+            return data;
         }
         catch (e) { }
     },
