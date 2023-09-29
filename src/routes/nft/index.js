@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import NavBar from "../../components/navbar";
 import useNFTStore from "../../store/nft";
-import { Alert, AlertDescription, AlertIcon, AlertTitle, Box, Button, Center, Container, Flex, Grid, GridItem, Heading, Image, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, SkeletonText, Spinner, Stack, StackDivider, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useDisclosure, useToast } from '@chakra-ui/react';
+import { Alert, AlertDescription, AlertIcon, AlertTitle, Box, Button, ButtonGroup, Center, Container, Divider, Flex, Grid, GridItem, Heading, Image, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, SkeletonText, Spinner, Stack, StackDivider, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useColorModeValue, useDisclosure, useToast } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel, Textarea, Link } from '@chakra-ui/react'
 import SendNftModal from '../../components/sendNftModal';
 import Loading from '../../components/loader';
@@ -147,7 +147,7 @@ const NFTRoute = () => {
             const newObj = await JSON.parse(e.data);
 
             const txid = await newObj.txid;
-
+            console.log(newObj)
             if (txid !== undefined) {
                 getNFTState(txid);
                 onClose();
@@ -155,6 +155,13 @@ const NFTRoute = () => {
                     title:
                         "NFT created successfully ",
                     status: "success",
+                });
+            }
+            else if (false) {
+                toast({
+                    title:
+                        "NFT creation failed ",
+                    status: "error",
                 });
             }
         };
@@ -238,7 +245,7 @@ const NFTRoute = () => {
 
                                 {nftState.storeNft.success.ok ?
                                     <Text my='10px' fontWeight='semibold' fontSize={'xl'} textColor={'blue.600'}>
-                                        Step 4 - Go to the select tab from top and send the NFT badge to your customer.
+                                        Step 4 - Go to the select tab from top and send the NFT badge to send to your customer.
                                     </Text> : ""}
 
                                 <form onSubmit={handleCreateBadge}>
@@ -280,13 +287,13 @@ const NFTRoute = () => {
                                                     </Center>
                                                     <Center>
 
-                                                        {nftState.post.success.ok ?
+                                                        {nftState.get.success.ok ?
                                                             <Button isLoading={nftState.storeNft.loading} colorScheme={"messenger"} variant='solid' mt={'10px'}
                                                                 onClick={saveNft}
                                                                 isDisabled={nftState.storeNft.success.ok}>
                                                                 Save NFT Badge
                                                             </Button> :
-                                                            <Button isLoading={nftState.post.loading} colorScheme={"messenger"} variant='solid' mt={'10px'} isDisabled={nftState.post.success.ok}
+                                                            <Button isLoading={nftState.post.loading} colorScheme={"messenger"} variant='solid' mt={'10px'} isDisabled={nftState.get.success.ok}
                                                                 onClick={handleCreateNFT}>
                                                                 Create NFT with your badge
                                                             </Button>}
@@ -350,7 +357,7 @@ const NFTRoute = () => {
                             </Box>
 
 
-                            {nftState.post.success.ok ?
+                            {nftState.get.success.ok ?
                                 <Alert
                                     status={'success'}
                                     variant="subtle"
@@ -388,7 +395,7 @@ const NFTRoute = () => {
                                     <Heading fontSize={'large'} textAlign={'center'} my='16px'>Your Selected Badge</Heading>
                                     <Center >
                                         <Image
-                                            borderRadius='3xl'
+                                            borderRadius='lg'
                                             boxSize='150px'
                                             src={nftState.select.success?.data?.image}
                                             alt='Badge Image'
@@ -401,23 +408,66 @@ const NFTRoute = () => {
                             {allNfts ? <Center mt={'8'}>
                                 <Grid templateColumns='repeat(3, 1fr)' gap={'16'}>
                                     {allNfts.map((nft, i) =>
-                                        <GridItem key={i} w='100%' bg={'white'} p={'2'} rounded={'2xl'}
-                                            _hover="{ bg: 'blue.500' }">
-                                            <Image
-                                                borderRadius='3xl'
-                                                boxSize='150px'
-                                                src={nft.image}
-                                                alt='Badge Image'
-                                            />
-                                            <Text align={'center'} mt={'1.5'} fontWeight={'semibold'}>
-                                                {nft.name}
-                                            </Text>
-                                            <Center>
-                                                <Button colorScheme={"messenger"} variant='solid' mt={'10px'} onClick={() => handleSelectNft(nft)}>
-                                                    Select
-                                                </Button>
-                                            </Center>
-                                        </GridItem>
+                                        <Center key={i} py={12}
+                                            onClick={() => handleSelectNft(nft)}
+                                            style={{ cursor: "pointer" }}
+                                        >
+                                            <Box
+                                                role={'group'}
+                                                p={6}
+                                                maxW={'330px'}
+                                                w={'full'}
+                                                bg={'white'}
+                                                boxShadow={'2xl'}
+                                                rounded={'lg'}
+                                                pos={'relative'}
+                                                zIndex={1}>
+                                                <Box
+                                                    rounded={'lg'}
+                                                    mt={-12}
+                                                    pos={'relative'}
+                                                    height={'200px'}
+                                                    _after={{
+                                                        transition: 'all .3s ease',
+                                                        content: '""',
+                                                        w: 'full',
+                                                        h: 'full',
+                                                        pos: 'absolute',
+                                                        top: 5,
+                                                        left: 0,
+                                                        backgroundImage: `url(${nft.image})`,
+                                                        filter: 'blur(15px)',
+                                                        zIndex: -1,
+                                                    }}
+                                                    _groupHover={{
+                                                        _after: {
+                                                            filter: 'blur(20px)',
+                                                        },
+                                                    }}>
+                                                    <Image
+                                                        rounded={'lg'}
+                                                        height={230}
+                                                        width={282}
+                                                        objectFit={'cover'}
+                                                        src={nft.image}
+                                                        alt="#"
+                                                    />
+                                                </Box>
+                                                <Stack pt={10} align={'center'}>
+                                                    <Text color={'gray.500'} fontSize={'sm'} textTransform={'uppercase'}>
+                                                        Badge
+                                                    </Text>
+                                                    <Heading fontSize={'2xl'} fontFamily={'body'} fontWeight={500}>
+                                                        {nft.name}
+                                                    </Heading>
+                                                    <Stack direction={'row'} align={'center'}>
+                                                        <Text fontWeight={100} fontSize={'sm'}>
+                                                            {nft.description}
+                                                        </Text>
+                                                    </Stack>
+                                                </Stack>
+                                            </Box>
+                                        </Center>
                                     )}
 
                                 </Grid>
@@ -492,10 +542,14 @@ const NFTRoute = () => {
                                             </Tr>
                                         </Thead>
                                         {orders.length === 0 ?
-                                            <Box width={"100%"} alignItems="center">
-                                                <SkeletonText mt="4" noOfLines={4} spacing="4" />
-                                            </Box> :
-
+                                            <Tbody>
+                                                <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
+                                                <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
+                                                <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
+                                                <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
+                                                <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
+                                            </Tbody>
+                                            :
                                             <Tbody>
                                                 {orders.map(
                                                     (order, i) => (

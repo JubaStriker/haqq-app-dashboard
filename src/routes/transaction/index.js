@@ -38,12 +38,11 @@ const TransactionRoute = () => {
   const getTransactionState = useTransactionStore(
     (state) => state.getTransactionState
   );
+  console.log(transactionState.get)
 
   useEffect(async () => {
     getTransactionState(shop, stellarHorizonAPI);
   }, []);
-
-  console.log(transactionState.get.success, "data")
 
   if (transactionState.get.loading) {
     return (
@@ -150,6 +149,14 @@ const TransactionRoute = () => {
                 )}
                 {blockChain === "ripple" ? (
                   <Tbody>
+                    {transactionState.get.success.data.length === 0 ?
+                      <Tr>
+                        <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
+                        <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
+                        <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
+                        <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
+                        <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
+                      </Tr> : ""}
                     {transactionState.get.success.data?.result?.transactions?.map(
                       (details) => (
                         // <Text>{details.tx.Account}</Text>
