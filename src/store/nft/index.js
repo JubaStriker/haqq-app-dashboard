@@ -70,6 +70,17 @@ const INITIAL_NFT_STATE = {
             error: false,
             message: "",
         },
+    },
+    send: {
+        loading: false,
+        success: {
+            ok: false,
+            data: {},
+        },
+        failure: {
+            error: false,
+            message: "",
+        },
     }
 
 };
@@ -308,10 +319,7 @@ const useNFTStore = create((set) => ({
         }
 
     },
-
-
-
-    createSellOffer: async (seed, tokenID, amount, flags, code) => {
+    createSellOffer: async (account, code, tokenID) => {
         set(
             produce((state) => ({
                 ...state,
@@ -334,16 +342,13 @@ const useNFTStore = create((set) => ({
         );
         try {
             const body = {
-                seed: seed,
-                tokenID: tokenID,
-                amount: amount,
-                flags: flags,
+                account: account,
                 code: code,
+                tokenID: tokenID
             };
-
             const { data } = await axios.post(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/transfer_nft`, body)
 
-            if (data?.type === 'response') {
+            if (data) {
                 set(
                     produce((state) => ({
                         ...state,
@@ -361,14 +366,70 @@ const useNFTStore = create((set) => ({
                     }))
                 );
             }
-            console.log('Response:', data);
+            return data;
 
         }
         catch (e) {
             console.error(e);
             throw e;
         }
+    },
+    sendNFT: async ({ code, name, email, txid }) => {
+        set(
+            produce((state) => ({
+                ...state,
+                nftState: {
+                    ...state.nftState,
+                    send: {
+                        ...INITIAL_NFT_STATE.send,
+                        loading: true,
+                    },
+                },
+            }))
+        );
+        try {
+            const body = {
+                code: code,
+                name: name,
+                email: email,
+                txid: txid
+            };
+
+            const { data } = await axios.post(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/send_mail`, body)
+
+            if (data) {
+                set(
+                    produce((state) => ({
+                        ...state,
+                        nftState: {
+                            ...state.nftState,
+                            send: {
+                                ...INITIAL_NFT_STATE.send,
+                                loading: false,
+                                success: {
+                                    ok: true,
+                                    data: data,
+                                },
+                            },
+                            select: {
+                                ...INITIAL_NFT_STATE.select,
+                                loading: false,
+                                success: {
+                                    ok: false,
+                                    data: "",
+                                },
+                            }
+                        },
+                    }))
+                );
+            }
+            return data;
+
+        } catch (e) {
+            console.error(e);
+        }
     }
+
 }));
 
 export default useNFTStore;

@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import NavBar from "../../components/navbar";
 import useNFTStore from "../../store/nft";
-import { Alert, AlertDescription, AlertIcon, AlertTitle, Box, Button, ButtonGroup, Center, Container, Divider, Flex, Grid, GridItem, Heading, Image, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, SkeletonText, Spinner, Stack, StackDivider, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useColorModeValue, useDisclosure, useToast } from '@chakra-ui/react';
-import { Tabs, TabList, TabPanels, Tab, TabPanel, Textarea, Link } from '@chakra-ui/react'
+import { Alert, AlertDescription, AlertIcon, Box, Button, Center, Container, Flex, Grid, GridItem, Heading, Image, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, SkeletonText, Spinner, Stack, StackDivider, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useColorModeValue, useDisclosure, useToast } from '@chakra-ui/react';
+import { Tabs, TabList, TabPanels, Tab, TabPanel, Textarea } from '@chakra-ui/react'
 import SendNftModal from '../../components/sendNftModal';
 import Loading from '../../components/loader';
 import axios from 'axios';
@@ -31,13 +31,13 @@ const NFTRoute = () => {
     const selectNft = useNFTStore((state) => state.selectNft);
     const getWalletAddress = useWalletStore((state) => state.getWalletAddress);
 
-    // useEffect(() => {
-    //     fetch(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/get_orders?shop=${shop}`)
-    //         .then(res => res.json())
-    //         .then(data => setAllOrders(data));
-    // }, [shop])
+    useEffect(() => {
+        fetch(`https://jubairhossain.pagekite.me/api/get_orders?shop=${shop}`)
+            .then(res => res.json())
+            .then(data => setAllOrders(data));
+    }, [shop])
 
-    // console.log(allOrders)
+    console.log(allOrders)
 
     useEffect(() => {
         const getNfts = async () => {
@@ -157,17 +157,10 @@ const NFTRoute = () => {
                     status: "success",
                 });
             }
-            else if (false) {
-                toast({
-                    title:
-                        "NFT creation failed ",
-                    status: "error",
-                });
-            }
         };
     }
 
-    console.log(nftState.get)
+
     useEffect(() => {
         setNftId(nftState.get.success.data?.nftoken_id)
     }, [nftState.get.success.data])
@@ -487,7 +480,7 @@ const NFTRoute = () => {
                                         <Heading fontSize={'large'} textAlign={'center'} my='16px'>Your Selected Badge</Heading>
                                         <Center >
                                             <Image
-                                                borderRadius='3xl'
+                                                borderRadius='lg'
                                                 boxSize='150px'
                                                 src={nftState.select.success?.data?.image}
                                                 alt='Badge Image'
@@ -506,23 +499,51 @@ const NFTRoute = () => {
                                 {nftState.offer.loading ? <>
                                     <Loading></Loading>
                                 </> : ""}
-
-                                {nftState.offer.success.ok ? <Box bg="white" maxW="5xl" mx="auto" borderRadius={10} p={5} mt={'24px'} boxShadow="md">
-                                    <Heading size='xs' mb={'20px'} fontWeight={"semibold"}>
-                                        Created offers for NFToken ID : {nftState.offer.success.data?.result?.nft_id}
+                                {nftState.send.success.ok ? <Alert
+                                    status={'success'}
+                                    variant="subtle"
+                                    flexDirection="column"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                    textAlign="center"
+                                    height="200px"
+                                    rounded="md"
+                                    boxShadow="lg"
+                                    mt={'3'}
+                                    mb={4}
+                                >
+                                    <AlertIcon boxSize="40px" mb={2} />
+                                    <Heading size='xs' mb={'20px'} textAlign={'center'} fontSize={'2xl'}>
+                                        NFT sent <Text as={'span'} color={'green.400'}>Successfully</Text>
                                     </Heading>
-                                    <Stack divider={<StackDivider />} spacing='4'>
-                                        {nftState.offer.success.data?.result?.offers?.map(offer =>
-                                            <Box key={offer.NFTokenID}>
-                                                <Text>Your NFT Badge has been sent to XRP wallet address <Text as={'span'} fontWeight={'bold'}>{offer.destination}</Text>
-                                                </Text>
 
-                                            </Box>)}
-                                        <Text fontStyle={"italic"} as='u' cursor={'pointer'}>
-                                            <a href={nftState.offer.success.data?.payload?.next?.always} target='_blank' rel="noreferrer">Offer Accept QR </a>
-                                        </Text>
-                                    </Stack>
-                                </Box> : ""}
+                                </Alert> : ""}
+
+                                {nftState.send.loading ? <Alert
+                                    status={'info'}
+                                    variant="subtle"
+                                    flexDirection="column"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                    textAlign="center"
+                                    height="200px"
+                                    rounded="md"
+                                    boxShadow="lg"
+                                    mt={'3'}
+                                    mb={4}
+                                >
+
+                                    <AlertDescription maxWidth='sm' mb={'6'}>
+                                        Please wait while your transaction is in progress...
+                                    </AlertDescription>
+                                    <Spinner
+                                        thickness="4px"
+                                        speed="0.65s"
+                                        emptyColor="gray.200"
+                                        color="blue.500"
+                                        size="xl"
+                                    />
+                                </Alert> : ""}
 
 
                                 <Text mb='4px' align={"center"} mt={'8px'} size="xl" fontWeight="bold" >All of your orders that were paid through XRP</Text>
@@ -564,6 +585,7 @@ const NFTRoute = () => {
                                                                 <SendNftModal code={order.discount_codes[0]?.code}
                                                                     badge={nftState?.select?.success?.data?.image}
                                                                     name={order.billing_address?.first_name}
+                                                                    email={order.contact_email}
                                                                     tokenID={nftState?.select?.success?.data?.token} />
                                                             </Td>
                                                         </Tr>
@@ -573,21 +595,11 @@ const NFTRoute = () => {
                                         }
                                     </Table>
                                 </TableContainer>
-
-
-
                             </Box>
-
-
                         </TabPanel>
                     </TabPanels>
                 </Tabs>
-
             </Container >
-
-
-
-
         </>
     );
 };
