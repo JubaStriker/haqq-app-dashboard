@@ -249,9 +249,6 @@ const useNFTStore = create((set) => ({
         );
 
         try {
-            console.log(title, description, image, token);
-
-
             const body = {
                 title: title,
                 description: description,
@@ -295,7 +292,6 @@ const useNFTStore = create((set) => ({
 
         try {
             if (data.name) {
-
                 set(
                     produce((state) => ({
                         ...state,

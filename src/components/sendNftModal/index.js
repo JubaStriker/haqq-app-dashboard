@@ -62,7 +62,7 @@ const SendNftModal = (props) => {
             if (txid !== undefined) {
                 onClose();
                 const data = await sendNFT({ code, name, email, txid })
-                console.log(data);
+                console.log("Accept QR: ", data);
                 toast({
                     title:
                         "NFT sent successfully",

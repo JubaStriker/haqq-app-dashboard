@@ -37,7 +37,8 @@ const NFTRoute = () => {
             .then(data => setAllOrders(data));
     }, [shop])
 
-    console.log(allOrders)
+
+    // console.log(allOrders)
 
     useEffect(() => {
         const getNfts = async () => {
@@ -45,7 +46,7 @@ const NFTRoute = () => {
             setAllNfts(data)
         }
         getNfts()
-    }, [nftState.storeNft.loading, shop])
+    }, [nftState.storeNft.loading, shop, nftState.send.loading])
 
 
 
@@ -383,7 +384,7 @@ const NFTRoute = () => {
                                     Select an <Text as={'span'} textColor={'blue.500'}>NFTs</Text> to reward your customer
                                 </Heading>
                             </Center>
-                            {nftState.select.success?.data?.image ?
+                            {nftState.select.success?.ok ?
                                 <>
                                     <Heading fontSize={'large'} textAlign={'center'} my='16px'>Your Selected Badge</Heading>
                                     <Center >
@@ -477,15 +478,19 @@ const NFTRoute = () => {
 
                                         <Text mb='8px' align={"center"} fontSize={"2xl"} mt={'8px'} fontWeight="bold" textColor={'orange.400'} >Send your created NFT badge to your desired customer </Text>
 
-                                        <Heading fontSize={'large'} textAlign={'center'} my='16px'>Your Selected Badge</Heading>
-                                        <Center >
-                                            <Image
-                                                borderRadius='lg'
-                                                boxSize='150px'
-                                                src={nftState.select.success?.data?.image}
-                                                alt='Badge Image'
-                                            />
-                                        </Center>
+                                        {nftState.select.success?.ok ?
+                                            <>
+                                                <Heading fontSize={'large'} textAlign={'center'} my='16px'>Your Selected Badge</Heading>
+                                                <Center >
+                                                    <Image
+                                                        borderRadius='lg'
+                                                        boxSize='150px'
+                                                        src={nftState.select.success?.data?.image}
+                                                        alt='Badge Image'
+                                                    />
+                                                </Center>
+                                            </> :
+                                            ""}
                                         <Center >
                                             <Text fontWeight={'semibold'}>{nftState.select.success?.data?.name}</Text>
                                         </Center>
