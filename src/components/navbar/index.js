@@ -188,6 +188,12 @@ const DesktopNav = () => {
           src="https://assets-global.website-files.com/5dee83171c0040227763490c/5df16d8f13f4cced330e587b_stellar-logo-solo-1.png" /> :
         ""
       }
+      {blockchain === 'haqq' ?
+        <Image
+          height="32px"
+          src="https://haqq.network/assets/media-kit/haqq-logo.png" /> :
+        ""
+      }
 
     </Stack>
   );

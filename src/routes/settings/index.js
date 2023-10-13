@@ -170,7 +170,36 @@ const SettingsRoute = () => {
         });
       }
     }
+    // ----------------- Haqq ----------------- //
+    else if (blockChain === 'haqq') {
+      const walletAddress = data;
+      console.log("Wallet address", walletAddress);
+      if (walletAddress) {
+        try {
+          await postWalletAddress({ shop, walletAddress });
+          toast({
+            title: "Wallet address added successfully!",
+            status: "success",
+            duration: 3000,
+          });
+        } catch (e) {
+          toast({
+            title: e.message || "Something went wrong.",
+            status: "error",
+            duration: 3000,
+          });
+        }
+      } else {
+        toast({
+          title: "Your ISLM Wallet public address is invalid",
+          status: "error",
+          duration: 3000,
+        });
+      }
+    }
+
   }
+
 
 
   // ------------------------------------------------------------------------------//
@@ -190,7 +219,7 @@ const SettingsRoute = () => {
       walletAddress: Yup.string().required("Wallet Address Is required"),
       walletToken: Yup.string().required("Wallet USDCH Token to receive HBAR"),
     });
-  } else if (blockChain === "ripple" || blockChain === "near" || blockChain === "stellar") {
+  } else if (blockChain === "ripple" || blockChain === "near" || blockChain === "stellar" || blockChain === "haqq") {
     walletSchema = Yup.object().shape({
       walletAddress: Yup.string().required("Wallet Address Is required"),
     });
@@ -206,6 +235,9 @@ const SettingsRoute = () => {
         onSubmitHandler(values.walletAddress);
       }
       else if (values && blockChain === "near") {
+        onSubmitHandler(values.walletAddress);
+      }
+      else if (values && blockChain === "haqq") {
         onSubmitHandler(values.walletAddress);
       }
       else if (values && blockChain === "stellar") {
@@ -231,6 +263,12 @@ const SettingsRoute = () => {
       );
     }
     else if (blockChain === "ripple") {
+      formik.setFieldValue(
+        "walletAddress",
+        walletAddress?.get?.success?.data?.walletAddress || ""
+      );
+    }
+    else if (blockChain === "haqq") {
       formik.setFieldValue(
         "walletAddress",
         walletAddress?.get?.success?.data?.walletAddress || ""
@@ -447,6 +485,55 @@ const SettingsRoute = () => {
                   ) : (
                     <FormErrorMessage>
                       Please check NEAR wallet address where to receive NEAR from
+                      customers
+                    </FormErrorMessage>
+                  )}
+                </FormHelperText>
+              </FormControl>
+
+              <Button
+                mt={4}
+                onClick={formik.handleSubmit}
+                isLoading={walletAddress.post.loading}
+                type="submit"
+                size="sm"
+                colorScheme={"messenger"}
+              >
+                Submit
+              </Button>
+            </>
+          ) : (
+            ""
+          )}
+
+          {blockChain === "haqq" ? (
+            <>
+              <Text size="xl" fontWeight="bold" pb="5px">
+                Haqq wallet public address where you would receive ISLM from
+                customers
+              </Text>
+              <FormControl
+                onSubmit={formik.handleSubmit}
+                isInvalid={
+                  formik.touched.walletAddress && formik.errors.walletAddress
+                }
+              >
+                <Input
+                  id="walletAddress"
+                  name="walletAddress"
+                  type="text"
+                  placeholder="Haqq Wallet Address"
+                  onChange={formik.handleChange}
+                  value={formik.values.walletAddress}
+                />
+
+                <FormHelperText size="sm" color={"red"}>
+                  {formik.touched.walletAddress &&
+                    formik.errors.walletAddress ? (
+                    formik.errors.walletAddress
+                  ) : (
+                    <FormErrorMessage>
+                      Please check Haqq wallet address where to receive ISLM from
                       customers
                     </FormErrorMessage>
                   )}

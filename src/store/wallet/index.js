@@ -168,7 +168,7 @@ const useWalletStore = create((set, address) => ({
       );
     }
   },
-  postWalletAddress: async ({ shop, walletAddress, walletToken }) => {
+  postWalletAddress: async ({ walletAddress, walletToken }) => {
     set(
       produce((state) => ({
         ...state,

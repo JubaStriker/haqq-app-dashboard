@@ -41,11 +41,11 @@ const NFTRoute = () => {
     // console.log(allOrders)
 
     useEffect(() => {
-        const getNfts = async () => {
+        const getNfts = async (shop) => {
             const { data } = await axios.get(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/get_nfts?shop=${shop}`);
             setAllNfts(data)
         }
-        getNfts()
+        getNfts(shop)
     }, [nftState.storeNft.loading, shop, nftState.send.loading])
 
 

@@ -76,11 +76,21 @@ const useTransactionStore = create((set) => ({
       }
       // ----------------------- Stellar --------------------- //
       else if (blockChain === 'stellar') {
-        console.log(stellarHorizonAPI, "API")
         const server = new StellarSdk.Server('https://horizon-testnet.stellar.org');
         const payments = server.payments().forAccount(walletAddress);
         const paymentRecords = await payments.call();
         response = paymentRecords;
+      }
+      // ----------------------- Haqq --------------------- //
+      else if (blockChain === 'haqq') {
+
+        try {
+          const { data } = await axios.get(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/islm_Transactions?walletAddress=${walletAddress}`);
+          response = data;
+        } catch (e) {
+          console.log(e, 'Got fetch error')
+        }
+
       }
 
 

@@ -22,6 +22,7 @@ import NavBar from "../../components/navbar";
 import { ShopContext, StellarHorizonAPIContext, } from "../../context";
 import useTransactionStore from "../../store/transaction";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
+import axios from "axios";
 
 
 const TransactionRoute = () => {
@@ -95,6 +96,7 @@ const TransactionRoute = () => {
                   {blockChain === "ripple" ? "XRP Transaction Details" : ""}
                   {blockChain === "near" ? "NEAR Transaction Details" : ""}
                   {blockChain === "stellar" ? "XLM Transaction Details" : ""}
+                  {blockChain === "haqq" ? "ISLM Transaction Details" : ""}
                 </Text>
                 <Divider borderColor="gray.200" />
               </Box>
@@ -185,13 +187,49 @@ const TransactionRoute = () => {
                 ) : (
                   ""
                 )}
-                {blockChain === "near" ? (
-                  <Tbody>
 
+                {blockChain === "haqq" ? (
+                  <Tbody>
+                    {transactionState.get.success.data.length === 0 ?
+                      <Tr>
+                        <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
+                        <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
+                        <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
+                        <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
+                        <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
+                      </Tr> : ""}
+                    {transactionState.get.success.data?.map(
+                      (details) => (
+                        // <Text>{details.tx.Account}</Text>
+                        <Tr>
+                          <Td>{details.from.hash}</Td>
+
+                          {/* ---------- There is no Amount field  in tx*/}
+                          {/* <Td isNumeric>
+                            {window.xrpl.dropsToXrp(details.tx.Amount)}
+                          </Td> */}
+                          <Td>{details.value / 1e18}</Td>
+                          <Td>{details.fee.value / 1e18}</Td>
+                          <Td>{details.result}</Td>
+                          <Td>
+                            <Link
+                              color="teal"
+                              target="_blank"
+                              href={`${process.env.REACT_APP_ISLM_TRANSACTION_REFFERENCE}/${details.hash}`}
+                            >
+                              {details.hash}
+                            </Link>
+                          </Td>
+                        </Tr>
+                      )
+                    )}
                   </Tbody>
                 ) : (
                   ""
                 )}
+
+
+
                 {blockChain === 'stellar' ?
                   <Tbody>
                     {transactionState.get.success?.data?.records?.map((record) => (
