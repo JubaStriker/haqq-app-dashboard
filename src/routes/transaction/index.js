@@ -203,11 +203,6 @@ const TransactionRoute = () => {
                         // <Text>{details.tx.Account}</Text>
                         <Tr>
                           <Td>{details.from.hash}</Td>
-
-                          {/* ---------- There is no Amount field  in tx*/}
-                          {/* <Td isNumeric>
-                            {window.xrpl.dropsToXrp(details.tx.Amount)}
-                          </Td> */}
                           <Td>{details.value / 1e18}</Td>
                           <Td>{details.fee.value / 1e18}</Td>
                           <Td>{details.result}</Td>

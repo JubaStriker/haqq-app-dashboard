@@ -98,6 +98,24 @@ const useCurrencyExchangeStore = create((set) => ({
                     }))
                 )
             }
+            else if (blockChain === 'haqq') {
+                const data = 1530.24
+                set(
+                    produce((state) => ({
+                        ...state,
+                        currencyExchangeState: {
+                            ...state.currencyExchangeState,
+                            get: {
+                                ...INITIAL_CURRENCY_EXCHANGE_SATAE.get,
+                                success: {
+                                    ok: true,
+                                    data: data,
+                                }
+                            }
+                        }
+                    }))
+                )
+            }
             else if (blockChain === 'stellar') {
                 const { data = {} } = await axios.get(
                     "https://api.coinconvert.net/convert/usd/xlm?amount=1"

@@ -118,10 +118,6 @@ function CreateLooks(props) {
   const [looksName, setLooksName] = useState(props.looks.name);
   const [looksPrice, setLooksPrice] = useState(props.looks.price);
   const [lookCryptoPrice, setLookCryptoPrice] = useState();
-  const [lookHbarPrice, setLookHbarPrice] = useState();
-  const [lookXrpPrice, setLookXrpPrice] = useState();
-  const [lookXlmPrice, setLookXlmPrice] = useState();
-  const [lookNearPrice, setLookNearPrice] = useState();
   const [uploads, setUploads] = useState(props.looks.files || []);
   const [products, setProducts] = useState(props.looks.products || []);
 
@@ -161,6 +157,11 @@ function CreateLooks(props) {
       );
     }
     else if (blockChain === 'near') {
+      setLookCryptoPrice(
+        (currencyExchangeState.get.success.data * data).toFixed(2)
+      );
+    }
+    else if (blockChain === 'haqq') {
       setLookCryptoPrice(
         (currencyExchangeState.get.success.data * data).toFixed(2)
       );
@@ -395,6 +396,11 @@ function CreateLooks(props) {
                   Items in this curation can be bought by paying with XLM/USDC
                 </Heading>
                 : ""}
+              {blockChain === 'haqq' ?
+                <Heading size="sm">
+                  Items in this curation can be bought by paying with ISLM
+                </Heading>
+                : ""}
 
             </Stack>
             <Box mt={10}>
@@ -602,6 +608,15 @@ function CreateLooks(props) {
                           )}
                         </InputRightAddon>
                         : ""}
+                      {blockChain === 'haqq' ?
+                        <InputRightAddon w={"50%"}>
+                          {currencyExchangeState.get.loading ? (
+                            <Spinner />
+                          ) : (
+                            `${lookCryptoPrice ? lookCryptoPrice : "0"} ISLM`
+                          )}
+                        </InputRightAddon>
+                        : ""}
 
 
                     </InputGroup>
@@ -629,6 +644,13 @@ function CreateLooks(props) {
                     {blockChain === 'stellar' ?
                       <FormHelperText>
                         The total number of XLM a customer has to pay to shop all
+                        of the above products in this curation. Please add a
+                        discounted price to encourage community.
+                      </FormHelperText>
+                      : ""}
+                    {blockChain === 'stellar' ?
+                      <FormHelperText>
+                        The total number of ISLM a customer has to pay to shop all
                         of the above products in this curation. Please add a
                         discounted price to encourage community.
                       </FormHelperText>
