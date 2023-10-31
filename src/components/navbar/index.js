@@ -23,11 +23,6 @@ import {
 } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
 
-let blockchain;
-const retrievedObject = localStorage.getItem('blockchain');
-const blockChainObj = JSON.parse(retrievedObject);
-blockchain = blockChainObj?.blockChain;
-
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
 
@@ -162,38 +157,9 @@ const DesktopNav = () => {
           </Popover>
         </Box>
       ))}
-
-      {blockchain === 'hedera' ?
-        <Image
-          height="32px"
-          src="https://powertransition.energy/sites/default/files/styles/partnersnode/public/partners/hedera-hashgraph.png?itok=HB8PEQ3K"
-        /> : ""
-      }
-
-      {blockchain === 'ripple' ?
-        <Image
-          height="32px"
-          src="https://sweatcoinguide.com/wp-content/uploads/2017/12/ripple-xrp-logo.png" /> :
-        ""
-      }
-      {blockchain === 'near' ?
-        <Image
-          height="32px"
-          src="https://seeklogo.com/images/N/near-protocol-near-logo-3CBD263358-seeklogo.com.png" /> :
-        ""
-      }
-      {blockchain === 'stellar' ?
-        <Image
-          height="32px"
-          src="https://assets-global.website-files.com/5dee83171c0040227763490c/5df16d8f13f4cced330e587b_stellar-logo-solo-1.png" /> :
-        ""
-      }
-      {blockchain === 'haqq' ?
-        <Image
-          height="32px"
-          src="https://haqq.network/assets/media-kit/haqq-logo.png" /> :
-        ""
-      }
+      <Image
+        height="32px"
+        src="https://haqq.network/assets/media-kit/haqq-logo.png" />
 
     </Stack>
   );
@@ -327,57 +293,5 @@ let NAV_ITEMS = [
   },
 ];
 
-if (blockchain === "hedera") {
-  NAV_ITEMS = [
-    {
-      label: "New Curation",
-      href: "/looks/create",
-    },
-    {
-      label: "Settings",
-      href: "/settings",
-    },
-    {
-      label: "Transactions & Payments",
-      href: "/transaction",
-    },
 
-    {
-      label: "Earn",
-      href: "/earn",
-    },
-    {
-      label: "Embed",
-      href: "/embed-instructions",
-    },
-  ];
-}
-else if (blockchain === 'ripple') {
-  NAV_ITEMS = [
-    {
-      label: "New Curation",
-      href: "/looks/create",
-    },
-    {
-      label: "Settings",
-      href: "/settings",
-    },
-    {
-      label: "Transactions & Payments",
-      href: "/transaction",
-    },
 
-    // {
-    //   label: "Earn",
-    //   href: "/earn",
-    // },
-    {
-      label: "Embed",
-      href: "/embed-instructions",
-    },
-    {
-      label: "NFTs",
-      href: "/nft",
-    },
-  ];
-}

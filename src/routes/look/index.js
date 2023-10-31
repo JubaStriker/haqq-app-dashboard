@@ -105,16 +105,8 @@ function CreateLooks(props) {
     (state) => state.getCurrencyExchangeState
   );
   const getWalletAddress = useWalletStore((state) => state.getWalletAddress);
-
-
-
-  console.log(currencyExchangeState, "Currency exchange state")
-  console.log(looks.get, "Looks state")
-
   const { id = "" } = useParams();
   const toast = useToast();
-  const navigate = useNavigate();
-  const colorMode = useColorModeValue("gray.100", "gray.700");
   const [looksName, setLooksName] = useState(props.looks.name);
   const [looksPrice, setLooksPrice] = useState(props.looks.price);
   const [lookCryptoPrice, setLookCryptoPrice] = useState();
@@ -132,10 +124,6 @@ function CreateLooks(props) {
   if (walletAddress?.get?.success?.data?.walletAddress) {
     cryptoReceiver = walletAddress?.get?.success?.data?.walletAddress
   }
-  console.log(cryptoReceiver)
-
-
-
 
 
   const [totalProductsPrice, setTotlaProductsPrice] = useState("");
@@ -145,32 +133,12 @@ function CreateLooks(props) {
   };
 
   const getExchangeRate = (data) => {
-    console.log(data);
-    if (blockChain === 'hedera') {
+    if (data) {
       setLookCryptoPrice(
         (currencyExchangeState.get.success.data * data).toFixed(2)
       );
     }
-    else if (blockChain === 'ripple') {
-      setLookCryptoPrice(
-        (currencyExchangeState.get.success.data.xrp * data).toFixed(2)
-      );
-    }
-    else if (blockChain === 'near') {
-      setLookCryptoPrice(
-        (currencyExchangeState.get.success.data * data).toFixed(2)
-      );
-    }
-    else if (blockChain === 'haqq') {
-      setLookCryptoPrice(
-        (currencyExchangeState.get.success.data * data).toFixed(2)
-      );
-    }
-    else if (blockChain === 'stellar') {
-      setLookCryptoPrice(
-        (currencyExchangeState?.get?.success?.data * data).toFixed(2)
-      );
-    } else {
+    else {
       toast({
         title: "Could not fetch prices. Please try again ",
         status: "error",
@@ -209,7 +177,6 @@ function CreateLooks(props) {
         setLooksName(data?.name);
         setUploads([...uploads, ...data?.medias]);
         setLooksPrice([data?.price]);
-        // console.log("asdf ", data.products);
         setProducts([
           ...products,
           ...data?.products.map((p) => ({
@@ -242,7 +209,6 @@ function CreateLooks(props) {
   const removeProduct = (index) => {
     products.splice(index, 1);
     setProducts([...products.filter(Boolean)]);
-    // console.log(products);
     let productSum = 0;
     const result = products.reduce((p, n) => {
       productSum = p + parseFloat(n.price);
@@ -376,31 +342,11 @@ function CreateLooks(props) {
               >
                 {data && data.name ? data.name : "Create a shoppable curation"}
               </Heading>
-              {blockChain === 'hedera' ?
-                <Heading size="sm">
-                  Items in this curation can be bought by paying with HBAR
-                </Heading>
-                : ""}
-              {blockChain === 'ripple' ?
-                <Heading size="sm">
-                  Items in this curation can be bought by paying with XRP
-                </Heading>
-                : ""}
-              {blockChain === 'near' ?
-                <Heading size="sm">
-                  Items in this curation can be bought by paying with NEAR
-                </Heading>
-                : ""}
-              {blockChain === 'stellar' ?
-                <Heading size="sm">
-                  Items in this curation can be bought by paying with XLM/USDC
-                </Heading>
-                : ""}
-              {blockChain === 'haqq' ?
-                <Heading size="sm">
-                  Items in this curation can be bought by paying with ISLM
-                </Heading>
-                : ""}
+
+              <Heading size="sm">
+                Items in this curation can be bought by paying with ISLM
+              </Heading>
+
 
             </Stack>
             <Box mt={10}>
@@ -570,91 +516,25 @@ function CreateLooks(props) {
                         onBlur={(e) => getExchangeRate(e.target.value)}
                         required
                       />
-                      {/* ------------- Hedera ------------------ */}
-                      {blockChain === 'hedera' ?
-                        <InputRightAddon w={"50%"}>
-                          {currencyExchangeState.get.loading ? (
-                            <Spinner />
-                          ) : (
-                            `${lookCryptoPrice ? lookCryptoPrice : "0"} HBAR`
-                          )}
-                        </InputRightAddon>
-                        : ""}
 
-                      {blockChain === 'ripple' ?
-                        <InputRightAddon w={"50%"}>
-                          {currencyExchangeState.get.loading ? (
-                            <Spinner />
-                          ) : (
-                            `${lookCryptoPrice ? lookCryptoPrice : "0"} XRP`
-                          )}
-                        </InputRightAddon>
-                        : ""}
-                      {blockChain === 'near' ?
-                        <InputRightAddon w={"50%"}>
-                          {currencyExchangeState.get.loading ? (
-                            <Spinner />
-                          ) : (
-                            `${lookCryptoPrice ? lookCryptoPrice : "0"} NEAR`
-                          )}
-                        </InputRightAddon>
-                        : ""}
-                      {blockChain === 'stellar' ?
-                        <InputRightAddon w={"50%"}>
-                          {currencyExchangeState.get.loading ? (
-                            <Spinner />
-                          ) : (
-                            `${lookCryptoPrice ? lookCryptoPrice : "0"} XLM`
-                          )}
-                        </InputRightAddon>
-                        : ""}
-                      {blockChain === 'haqq' ?
-                        <InputRightAddon w={"50%"}>
-                          {currencyExchangeState.get.loading ? (
-                            <Spinner />
-                          ) : (
-                            `${lookCryptoPrice ? lookCryptoPrice : "0"} ISLM`
-                          )}
-                        </InputRightAddon>
-                        : ""}
 
+                      <InputRightAddon w={"50%"}>
+                        {currencyExchangeState.get.loading ? (
+                          <Spinner />
+                        ) : (
+                          `${lookCryptoPrice ? lookCryptoPrice : "0"} ISLM`
+                        )}
+                      </InputRightAddon>
 
                     </InputGroup>
-                    {blockChain === 'hedera' ?
-                      <FormHelperText>
-                        The total number of HBAR user has to pay to shop all of
-                        the above products in this look
-                      </FormHelperText>
-                      : ''}
 
-                    {blockChain === 'ripple' ?
-                      <FormHelperText>
-                        The total number of XRP a customer has to pay to shop all
-                        of the above products in this curation. Please add a
-                        discounted price to encourage community.
-                      </FormHelperText>
-                      : ""}
-                    {blockChain === 'near' ?
-                      <FormHelperText>
-                        The total number of NEAR tokens a customer has to pay to shop all
-                        of the above products in this curation. Please add a
-                        discounted price to encourage community.
-                      </FormHelperText>
-                      : ""}
-                    {blockChain === 'stellar' ?
-                      <FormHelperText>
-                        The total number of XLM a customer has to pay to shop all
-                        of the above products in this curation. Please add a
-                        discounted price to encourage community.
-                      </FormHelperText>
-                      : ""}
-                    {blockChain === 'stellar' ?
-                      <FormHelperText>
-                        The total number of ISLM a customer has to pay to shop all
-                        of the above products in this curation. Please add a
-                        discounted price to encourage community.
-                      </FormHelperText>
-                      : ""}
+
+                    <FormHelperText>
+                      The total number of ISLM a customer has to pay to shop all
+                      of the above products in this curation. Please add a
+                      discounted price to encourage community.
+                    </FormHelperText>
+
 
                   </FormControl>
                 </Stack>

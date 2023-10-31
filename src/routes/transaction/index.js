@@ -1,7 +1,6 @@
 import {
   Box,
   Container,
-  Heading,
   Table,
   TableContainer,
   Th,
@@ -15,15 +14,11 @@ import {
   Link,
   SkeletonCircle,
   SkeletonText,
-  Center,
 } from "@chakra-ui/react";
 import { useContext, useEffect } from "react";
 import NavBar from "../../components/navbar";
-import { ShopContext, StellarHorizonAPIContext, } from "../../context";
+import { ShopContext } from "../../context";
 import useTransactionStore from "../../store/transaction";
-import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
-import axios from "axios";
-
 
 const TransactionRoute = () => {
   let blockChain;
@@ -32,7 +27,7 @@ const TransactionRoute = () => {
   blockChain = blockChainObj?.blockChain;
 
   const shop = useContext(ShopContext);
-  const stellarHorizonAPI = useContext(StellarHorizonAPIContext);
+
 
   const transactionState = useTransactionStore(
     (state) => state.transactionState);
@@ -74,29 +69,11 @@ const TransactionRoute = () => {
           bg="#f6f6f7"
           textAlign={"left"}
         >
-          {/* <Alert status="info" mb="5">
-            <AlertIcon />
-            <Box>
-              <AlertTitle>Now earn with your crypto!</AlertTitle>
-              <AlertDescription>
-                <ReactRouteLink to="/earn">
-                  <Text decoration="underline" color="blue">
-                    Lend or stake your crypto today to earn interest.
-                  </Text>
-                </ReactRouteLink>
-              </AlertDescription>
-            </Box>
-          </Alert> */}
-
           <Box bg="white" width={"5xl"} m="auto" p={5} borderRadius="10px">
             <VStack spacing={2} align="stretch">
               <Box>
                 <Text size="xl" fontWeight="bold">
-                  {blockChain === "hedera" ? "HABR Transaction Details" : ""}
-                  {blockChain === "ripple" ? "XRP Transaction Details" : ""}
-                  {blockChain === "near" ? "NEAR Transaction Details" : ""}
-                  {blockChain === "stellar" ? "XLM Transaction Details" : ""}
-                  {blockChain === "haqq" ? "ISLM Transaction Details" : ""}
+                  ISLM Transaction Details
                 </Text>
                 <Divider borderColor="gray.200" />
               </Box>
@@ -105,168 +82,49 @@ const TransactionRoute = () => {
             <TableContainer p="5">
               <Table variant={"simple"}>
                 <Thead>
-                  {blockChain === "stellar" ?
-                    <Tr>
-                      <Th>Amount</Th>
-                      <Th>Date</Th>
-                      <Th>From</Th>
-                      <Th>Status</Th>
-                      <Th>Transaction</Th>
-                    </Tr>
-                    :
-                    <Tr>
-                      <Th>Account</Th>
-                      <Th isNumeric>Amount</Th>
-                      <Th>Fee</Th>
-                      <Th>Result</Th>
-                      <Th>Transaction Ref</Th>
-                    </Tr>}
+
+                  <Tr>
+                    <Th>Account</Th>
+                    <Th isNumeric>Amount</Th>
+                    <Th>Fee</Th>
+                    <Th>Result</Th>
+                    <Th>Transaction Ref</Th>
+                  </Tr>
                 </Thead>
-                {blockChain === "hedera" ? (
-                  <Tbody>
-                    {transactionState?.get?.success?.data?.transactions?.map(
-                      (details) => (
-                        <Tr>
-                          <Td>{details.transfers.slice(-1).pop().account}</Td>
-                          <Td isNumeric>
-                            {details.transfers.slice(-1).pop().amount}
-                          </Td>
-                          <Td>{details.charged_tx_fee}</Td>
-                          <Td>{details.result}</Td>
-                          <Td>
-                            <Link
-                              color="teal"
-                              target="_blank"
-                              href={`${process.env.REACT_APP_HBAR_TRANSACTION_REFFERENCE}transaction/${details.transaction_id}`}
-                            >
-                              {details.transaction_id}
-                            </Link>
-                          </Td>
-                        </Tr>
-                      )
-                    )}
-                  </Tbody>
-                ) : (
-                  ""
-                )}
-                {blockChain === "ripple" ? (
-                  <Tbody>
-                    {transactionState.get.success.data.length === 0 ?
+
+
+                <Tbody>
+                  {transactionState.get.success.data.length === 0 ?
+                    <Tr>
+                      <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
+                      <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
+                      <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
+                      <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
+                      <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
+                    </Tr> : ""}
+                  {transactionState.get.success.data?.map(
+                    (details) => (
+                      // <Text>{details.tx.Account}</Text>
                       <Tr>
-                        <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
-                        <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
-                        <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
-                        <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
-                        <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
-                      </Tr> : ""}
-                    {transactionState.get.success.data?.result?.transactions?.map(
-                      (details) => (
-                        // <Text>{details.tx.Account}</Text>
-                        <Tr>
-                          <Td>{details.tx.Account}</Td>
-
-                          {/* ---------- There is no Amount field  in tx*/}
-                          {/* <Td isNumeric>
-                            {window.xrpl.dropsToXrp(details.tx.Amount)}
-                          </Td> */}
-                          <Td>{details.tx.inLedger}</Td>
-                          <Td>{details.tx.Fee}</Td>
-                          <Td>
-                            <Link
-                              color="teal"
-                              target="_blank"
-                              href={`${process.env.REACT_APP_XRP_TRANSACTION_REFFERENCE}transactions/${details.tx.hash}`}
-                            >
-                              {details.tx.hash}
-                            </Link>
-                          </Td>
-                        </Tr>
-                      )
-                    )}
-                  </Tbody>
-                ) : (
-                  ""
-                )}
-
-                {blockChain === "haqq" ? (
-                  <Tbody>
-                    {transactionState.get.success.data.length === 0 ?
-                      <Tr>
-                        <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
-                        <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
-                        <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
-                        <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
-                        <Td><SkeletonText mt="4" noOfLines={5} spacing="4" /></Td>
-                      </Tr> : ""}
-                    {transactionState.get.success.data?.map(
-                      (details) => (
-                        // <Text>{details.tx.Account}</Text>
-                        <Tr>
-                          <Td>{details.from.hash}</Td>
-                          <Td>{details.value / 1e18}</Td>
-                          <Td>{details.fee.value / 1e18}</Td>
-                          <Td>{details.result}</Td>
-                          <Td>
-                            <Link
-                              color="teal"
-                              target="_blank"
-                              href={`${process.env.REACT_APP_ISLM_TRANSACTION_REFFERENCE}/${details.hash}`}
-                            >
-                              {details.hash}
-                            </Link>
-                          </Td>
-                        </Tr>
-                      )
-                    )}
-                  </Tbody>
-                ) : (
-                  ""
-                )}
-
-
-
-                {blockChain === 'stellar' ?
-                  <Tbody>
-                    {transactionState.get.success?.data?.records?.map((record) => (
-                      <Tr key={record.transaction_hash}>
-                        <Td>{parseFloat(record?.amount)?.toFixed(2)}</Td>
+                        <Td>{details.from.hash}</Td>
+                        <Td>{details.value / 1e18}</Td>
+                        <Td>{details.fee.value / 1e18}</Td>
+                        <Td>{details.result}</Td>
                         <Td>
-                          {new Date(record.created_at).toLocaleTimeString()}{" "}
-                          {new Date(record.created_at).toLocaleDateString()}
-                        </Td>
-                        <Td isTruncated maxW={100}>
-                          {record.from}
-                        </Td>
-                        <Td>
-                          {record.transaction_successful ? (
-                            <CheckIcon color="green" />
-                          ) : (
-                            <CloseIcon color="red" />
-                          )}
-                        </Td>
-                        <Td isTruncated>
                           <Link
                             color="teal"
                             target="_blank"
-                            href={`${process.env.REACT_APP_STELLAR_LEDGER_EXPLORER}transactions/${record.transaction_hash}`}
+                            href={`${process.env.REACT_APP_ISLM_TRANSACTION_REFFERENCE}/${details.hash}`}
                           >
-                            <Text overflow="ellipsis" noOfLines={1} as="u">
-                              {record.transaction_hash}
-                            </Text>
+                            {details.hash}
                           </Link>
                         </Td>
                       </Tr>
-                    ))}
-                  </Tbody>
-                  :
-                  ""}
+                    )
+                  )}
+                </Tbody>
               </Table>
             </TableContainer>
-            {blockChain === "near" ?
-              <Center>
-                <Heading >Coming Soon...</Heading>
-              </Center> : ""}
-
           </Box>
         </Container>
       </>

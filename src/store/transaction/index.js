@@ -1,9 +1,6 @@
 import create from "zustand";
 import axios from "axios";
 import produce from "immer";
-import { INTERNAL_SERVER_ERROR } from "../../constants/strings";
-import { Client } from "xrpl";
-import StellarSdk from "stellar-sdk";
 
 let blockChain;
 const retrievedObject = localStorage.getItem('blockchain');
@@ -37,7 +34,7 @@ const INITIAL_TRANSACTION_STATE = {
 
 const useTransactionStore = create((set) => ({
   transactionState: INITIAL_TRANSACTION_STATE,
-  getTransactionState: async (shop, stellarHorizonAPI) => {
+  getTransactionState: async (shop) => {
     set(
       produce((state) => ({
         ...state,
@@ -57,42 +54,13 @@ const useTransactionStore = create((set) => ({
 
       let response;
 
-      // ----------------------- Hedera --------------------- //
-      if (blockChain === 'hedera') {
-        const url = `${process.env.REACT_APP_HEDERA_ACCOUNT_VERIFY}api/v1/transactions?account.id=${walletAddress}`
-        const result = await fetch(url)
-        response = await result.json();
-      }
-      // ----------------------- Ripple --------------------- //
-      else if (blockChain === 'ripple') {
-        const client = new Client(
-          `${process.env.REACT_APP_XRP_TRANSACTION_FETCH_UTL}`
-        );
-        await client.connect();
-        response = await client.request({
-          command: "account_tx",
-          account: walletAddress,
-        });
-      }
-      // ----------------------- Stellar --------------------- //
-      else if (blockChain === 'stellar') {
-        const server = new StellarSdk.Server('https://horizon-testnet.stellar.org');
-        const payments = server.payments().forAccount(walletAddress);
-        const paymentRecords = await payments.call();
-        response = paymentRecords;
-      }
-      // ----------------------- Haqq --------------------- //
-      else if (blockChain === 'haqq') {
 
-        try {
-          const { data } = await axios.get(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/islm_Transactions?walletAddress=${walletAddress}`);
-          response = data;
-        } catch (e) {
-          console.log(e, 'Got fetch error')
-        }
-
+      try {
+        const { data } = await axios.get(`${process.env.REACT_APP_API_SHOPLOOKS_SERVER_URL}/api/islm_Transactions?walletAddress=${walletAddress}`);
+        response = data;
+      } catch (e) {
+        console.log(e, 'Got fetch error')
       }
-
 
       set(
         produce((state) => ({

@@ -1,29 +1,21 @@
-import { useEffect, useContext, useState } from "react";
+import { useEffect, useContext } from "react";
 import {
   Box,
-  Heading,
   ButtonGroup,
   Text,
   Button,
   Container,
   useToast,
   Code,
-  Divider,
   Input,
   FormControl,
-  InputLeftElement,
-  InputGroup,
   FormHelperText,
   Alert,
   AlertIcon,
   SimpleGrid,
   FormErrorMessage,
-  Spinner,
   SkeletonText,
-  HStack,
-  FormLabel,
 } from "@chakra-ui/react";
-import Blur from "../../components/blur";
 import useScriptsStore from "../../store/scripts";
 import { ShopContext } from "../../context";
 import { INTERNAL_SERVER_ERROR } from "../../constants/strings";
@@ -31,8 +23,7 @@ import NavBar from "../../components/navbar";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import useWalletStore from "../../store/wallet";
-import WAValidator from "multicoin-address-validator";
-import StellarSdk from "stellar-sdk";
+
 
 const SettingsRoute = () => {
   let blockChain;
@@ -46,202 +37,59 @@ const SettingsRoute = () => {
   const getScripts = useScriptsStore((state) => state.getScripts);
   const destroyScripts = useScriptsStore((state) => state.destroyScripts);
   const toast = useToast();
-
-  const verifyWalletSate = useWalletStore((state) => state.verifyWalletSate);
   const walletAddress = useWalletStore((state) => state.walletState);
   const getWalletAddress = useWalletStore((state) => state.getWalletAddress);
   const postWalletAddress = useWalletStore((state) => state.postWalletAddress);
 
-  const verifyWalletAddress = useWalletStore(
-    (state) => state.verifyWalletAddress
-  );
-
-
-
   const onSubmitHandler = async (data) => {
-    // ----------------- Hedera ----------------- //
-    if (blockChain === "hedera") {
 
-      const { walletAddress, walletToken } = data;
-      await verifyWalletAddress(walletAddress);
-      console.log(verifyWalletSate.get.success.ok);
-      if (verifyWalletSate.get.success.ok === true) {
-        try {
-          await postWalletAddress({ shop, walletAddress, walletToken });
-          toast({
-            title: "Wallet address added successfully!",
-            status: "success",
-            duration: 3000,
-          });
-        } catch (e) {
-          toast({
-            title: e.message || "Something went wrong.",
-            status: "error",
-            duration: 3000,
-          });
-        }
-      } else {
+
+
+    const walletAddress = data;
+    console.log("Wallet address", walletAddress);
+    if (walletAddress) {
+      try {
+        await postWalletAddress({ shop, walletAddress });
         toast({
-          title: "Something went wrong.",
+          title: "Wallet address added successfully!",
+          status: "success",
+          duration: 3000,
+        });
+      } catch (e) {
+        toast({
+          title: e.message || "Something went wrong.",
           status: "error",
           duration: 3000,
         });
       }
+    } else {
+      toast({
+        title: "Your ISLM Wallet public address is invalid",
+        status: "error",
+        duration: 3000,
+      });
     }
-    // ----------------- Ripple ----------------- //
-    else if (blockChain === "ripple") {
-      const walletAddress = data;
-
-      const valid = WAValidator.validate(walletAddress, "ripple");
-      if (valid === true) {
-        try {
-          await postWalletAddress({ shop, walletAddress });
-          toast({
-            title: "Wallet address added successfully!",
-            status: "success",
-            duration: 3000,
-          });
-        } catch (e) {
-          toast({
-            title: e.message || "Something went wrong.",
-            status: "error",
-            duration: 3000,
-          });
-        }
-      } else {
-        toast({
-          title: "Wallet Address is Invalid",
-          status: "error",
-        });
-      }
-    }
-
-    // ----------------- Near ----------------- //
-    else if (blockChain === 'near') {
-      const walletAddress = data;
-
-      const valid = true;
-      if (valid === true) {
-        try {
-          await postWalletAddress({ shop, walletAddress });
-          toast({
-            title: "Wallet address added successfully!",
-            status: "success",
-            duration: 3000,
-          });
-        } catch (e) {
-          toast({
-            title: e.message || "Something went wrong.",
-            status: "error",
-            duration: 3000,
-          });
-        }
-      } else {
-        toast({
-          title: "Wallet Address is Invalid",
-          status: "error",
-        });
-      }
-    }
-    // ----------------- Stellar ----------------- //
-    else if (blockChain === 'stellar') {
-      const { walletAddress } = data;
-      const isValidKey = StellarSdk.StrKey.isValidEd25519PublicKey(walletAddress);
-      if (isValidKey) {
-        try {
-          await postWalletAddress({ shop, walletAddress });
-          toast({
-            title: "Wallet address added successfully!",
-            status: "success",
-            duration: 3000,
-          });
-        } catch (e) {
-          toast({
-            title: e.message || "Something went wrong.",
-            status: "error",
-            duration: 3000,
-          });
-        }
-      } else {
-        toast({
-          title: "Your XLM Wallet public address is invalid",
-          status: "error",
-          duration: 3000,
-        });
-      }
-    }
-    // ----------------- Haqq ----------------- //
-    else if (blockChain === 'haqq') {
-      const walletAddress = data;
-      console.log("Wallet address", walletAddress);
-      if (walletAddress) {
-        try {
-          await postWalletAddress({ shop, walletAddress });
-          toast({
-            title: "Wallet address added successfully!",
-            status: "success",
-            duration: 3000,
-          });
-        } catch (e) {
-          toast({
-            title: e.message || "Something went wrong.",
-            status: "error",
-            duration: 3000,
-          });
-        }
-      } else {
-        toast({
-          title: "Your ISLM Wallet public address is invalid",
-          status: "error",
-          duration: 3000,
-        });
-      }
-    }
-
   }
+
+
 
 
 
   // ------------------------------------------------------------------------------//
 
-  const connectWallet = () => {
-    window.open(
-      process.env.REACT_APP_SERVER_URL + "/connect-wallet",
-      "_blank",
-      "noopener,noreferrer"
-    );
-  };
-
   let walletSchema;
 
-  if (blockChain === "hedera") {
-    walletSchema = Yup.object().shape({
-      walletAddress: Yup.string().required("Wallet Address Is required"),
-      walletToken: Yup.string().required("Wallet USDCH Token to receive HBAR"),
-    });
-  } else if (blockChain === "ripple" || blockChain === "near" || blockChain === "stellar" || blockChain === "haqq") {
-    walletSchema = Yup.object().shape({
-      walletAddress: Yup.string().required("Wallet Address Is required"),
-    });
-  }
+  walletSchema = Yup.object().shape({
+    walletAddress: Yup.string().required("Wallet Address Is required"),
+  });
+
 
   const formik = useFormik({
     initialValues: { walletAddress: "", walletToken: "" },
     validationSchema: walletSchema,
     onSubmit: (values) => {
-      if (values && blockChain === "hedera") {
-        onSubmitHandler(values);
-      } else if (values && blockChain === "ripple") {
+      if (values) {
         onSubmitHandler(values.walletAddress);
-      }
-      else if (values && blockChain === "near") {
-        onSubmitHandler(values.walletAddress);
-      }
-      else if (values && blockChain === "haqq") {
-        onSubmitHandler(values.walletAddress);
-      }
-      else if (values && blockChain === "stellar") {
-        onSubmitHandler(values);
       }
     },
   });
@@ -252,40 +100,12 @@ const SettingsRoute = () => {
   }, []);
 
   useEffect(() => {
-    if (blockChain === "hedera") {
-      formik.setFieldValue(
-        "walletAddress",
-        walletAddress?.get?.success?.data?.walletAddress || ""
-      );
-      formik.setFieldValue(
-        "walletToken",
-        walletAddress?.get?.success?.data?.walletToken || ""
-      );
-    }
-    else if (blockChain === "ripple") {
-      formik.setFieldValue(
-        "walletAddress",
-        walletAddress?.get?.success?.data?.walletAddress || ""
-      );
-    }
-    else if (blockChain === "haqq") {
-      formik.setFieldValue(
-        "walletAddress",
-        walletAddress?.get?.success?.data?.walletAddress || ""
-      );
-    }
-    else if (blockChain === "near") {
-      formik.setFieldValue(
-        "walletAddress",
-        walletAddress?.get?.success?.data?.walletAddress || ""
-      );
-    }
-    else if (blockChain === "stellar") {
-      formik.setFieldValue(
-        "walletAddress",
-        walletAddress?.get?.success?.data?.walletAddress || ""
-      );
-    }
+    formik.setFieldValue(
+      "walletAddress",
+      walletAddress?.get?.success?.data?.walletAddress || ""
+    );
+
+
 
   }, [walletAddress?.get?.success?.data?.walletAddress]);
 
@@ -318,299 +138,49 @@ const SettingsRoute = () => {
     } else if (walletAddress.get.success.ok || !walletAddress.get.success.ok) {
       return (
         <Box>
-          {blockChain === "hedera" ? (
-            <>
-              <Text size="xl" fontWeight="bold" pb="5px">
-                HBAR wallet address and Token ID where to receive HBAR from
-                customer
-              </Text>
-              <FormControl
-                onSubmit={formik.handleSubmit}
-                isInvalid={
-                  formik.touched.walletAddress && formik.errors.walletAddress
-                }
-              >
-                <FormLabel>HBAR Wallet ID</FormLabel>
-                <Input
-                  id="walletAddress"
-                  name="walletAddress"
-                  type="text"
-                  placeholder="HBAR Wallet Address"
-                  onChange={formik.handleChange}
-                  value={formik.values.walletAddress}
-                />
 
-                <FormHelperText size="sm" color={"red"}>
-                  {formik.touched.walletAddress &&
-                    formik.errors.walletAddress ? (
-                    formik.errors.walletAddress
-                  ) : (
-                    <FormErrorMessage>
-                      Please check HBAR wallet address where to receive HBAR
-                      from customer
-                    </FormErrorMessage>
-                  )}
-                </FormHelperText>
-              </FormControl>
+          <Text size="xl" fontWeight="bold" pb="5px">
+            Haqq wallet public address where you would receive ISLM from
+            customers
+          </Text>
+          <FormControl
+            onSubmit={formik.handleSubmit}
+            isInvalid={
+              formik.touched.walletAddress && formik.errors.walletAddress
+            }
+          >
+            <Input
+              id="walletAddress"
+              name="walletAddress"
+              type="text"
+              placeholder="Haqq Wallet Address"
+              onChange={formik.handleChange}
+              value={formik.values.walletAddress}
+            />
 
-              <FormControl
-                onSubmit={formik.handleSubmit}
-                isInvalid={
-                  formik.touched.walletToken && formik.errors.walletToken
-                }
-              >
-                <FormLabel>USDC Token ID</FormLabel>
-                <Input
-                  id="walletToken"
-                  name="walletToken"
-                  type="text"
-                  placeholder="USDC Token ID"
-                  onChange={formik.handleChange}
-                  value={formik.values.walletToken}
-                />
+            <FormHelperText size="sm" color={"red"}>
+              {formik.touched.walletAddress &&
+                formik.errors.walletAddress ? (
+                formik.errors.walletAddress
+              ) : (
+                <FormErrorMessage>
+                  Please check Haqq wallet address where to receive ISLM from
+                  customers
+                </FormErrorMessage>
+              )}
+            </FormHelperText>
+          </FormControl>
 
-                <FormHelperText size="sm" color={"red"}>
-                  {formik.touched.walletToken && formik.errors.walletToken ? (
-                    formik.errors.walletToken
-                  ) : (
-                    <FormErrorMessage>
-                      Please check HBAR wallet address or Token ID where to
-                      receive HBAR from customer
-                    </FormErrorMessage>
-                  )}
-                </FormHelperText>
-              </FormControl>
-
-              <HStack>
-                <Button
-                  onClick={formik.handleSubmit}
-                  isLoading={walletAddress.post.loading}
-                  type="submit"
-                  size="sm"
-                  bgGradient="linear(to-bl, #594bab,#4d2c58)"
-                  color="white"
-                  _hover={{ bgGradient: "linear(to-bl, #ada1ed,#8e55a1)" }}
-                >
-                  Save Address
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => connectWallet()}
-                  bgGradient="linear(to-bl, #594bab,#4d2c58)"
-                  _hover={{ bgGradient: "linear(to-bl, #ada1ed,#8e55a1)" }}
-                  color="white"
-                >
-                  Connect to HBAR Wallet
-                </Button>
-              </HStack>
-            </>
-          ) : (
-            ""
-          )}
-
-          {blockChain === "ripple" ? (
-            <>
-              <Text size="xl" fontWeight="bold" pb="5px">
-                XRP wallet public address where you would receive XRP from
-                customers
-              </Text>
-              <FormControl
-                onSubmit={formik.handleSubmit}
-                isInvalid={
-                  formik.touched.walletAddress && formik.errors.walletAddress
-                }
-              >
-                <Input
-                  id="walletAddress"
-                  name="walletAddress"
-                  type="text"
-                  placeholder="XRP Wallet Address"
-                  onChange={formik.handleChange}
-                  value={formik?.values?.walletAddress}
-                />
-
-                <FormHelperText size="sm" color={"red"}>
-                  {formik.touched.walletAddress &&
-                    formik.errors.walletAddress ? (
-                    formik.errors.walletAddress
-                  ) : (
-                    <FormErrorMessage>
-                      Please check XRP wallet address where to receive XRP from
-                      customers
-                    </FormErrorMessage>
-                  )}
-                </FormHelperText>
-              </FormControl>
-
-              <Button
-                mt={4}
-                onClick={formik.handleSubmit}
-                isLoading={walletAddress.post.loading}
-                type="submit"
-                size="sm"
-                colorScheme={"messenger"}
-              >
-                Submit
-              </Button>
-            </>
-          ) : (
-            ""
-          )}
-
-          {blockChain === "near" ? (
-            <>
-              <Text size="xl" fontWeight="bold" pb="5px">
-                NEAR wallet public address where you would receive NEAR from
-                customers
-              </Text>
-              <FormControl
-                onSubmit={formik.handleSubmit}
-                isInvalid={
-                  formik.touched.walletAddress && formik.errors.walletAddress
-                }
-              >
-                <Input
-                  id="walletAddress"
-                  name="walletAddress"
-                  type="text"
-                  placeholder="NEAR Wallet Address"
-                  onChange={formik.handleChange}
-                  value={formik.values.walletAddress}
-                />
-
-                <FormHelperText size="sm" color={"red"}>
-                  {formik.touched.walletAddress &&
-                    formik.errors.walletAddress ? (
-                    formik.errors.walletAddress
-                  ) : (
-                    <FormErrorMessage>
-                      Please check NEAR wallet address where to receive NEAR from
-                      customers
-                    </FormErrorMessage>
-                  )}
-                </FormHelperText>
-              </FormControl>
-
-              <Button
-                mt={4}
-                onClick={formik.handleSubmit}
-                isLoading={walletAddress.post.loading}
-                type="submit"
-                size="sm"
-                colorScheme={"messenger"}
-              >
-                Submit
-              </Button>
-            </>
-          ) : (
-            ""
-          )}
-
-          {blockChain === "haqq" ? (
-            <>
-              <Text size="xl" fontWeight="bold" pb="5px">
-                Haqq wallet public address where you would receive ISLM from
-                customers
-              </Text>
-              <FormControl
-                onSubmit={formik.handleSubmit}
-                isInvalid={
-                  formik.touched.walletAddress && formik.errors.walletAddress
-                }
-              >
-                <Input
-                  id="walletAddress"
-                  name="walletAddress"
-                  type="text"
-                  placeholder="Haqq Wallet Address"
-                  onChange={formik.handleChange}
-                  value={formik.values.walletAddress}
-                />
-
-                <FormHelperText size="sm" color={"red"}>
-                  {formik.touched.walletAddress &&
-                    formik.errors.walletAddress ? (
-                    formik.errors.walletAddress
-                  ) : (
-                    <FormErrorMessage>
-                      Please check Haqq wallet address where to receive ISLM from
-                      customers
-                    </FormErrorMessage>
-                  )}
-                </FormHelperText>
-              </FormControl>
-
-              <Button
-                mt={4}
-                onClick={formik.handleSubmit}
-                isLoading={walletAddress.post.loading}
-                type="submit"
-                size="sm"
-                colorScheme={"messenger"}
-              >
-                Submit
-              </Button>
-            </>
-          ) : (
-            ""
-          )}
-          {blockChain === "stellar" ? (
-            <>
-              <Text size="xl" fontWeight="bold" pb="5px">
-                XLM wallet public address where you would receive XLM/USDC from
-                customers
-              </Text>
-              <FormControl
-                onSubmit={formik.handleSubmit}
-                isInvalid={
-                  formik.touched.walletAddress && formik.errors.walletAddress
-                }
-              >
-                <FormLabel>Your XLM Wallet Public Key</FormLabel>
-                <Input
-                  id="walletAddress"
-                  name="walletAddress"
-                  type="text"
-                  placeholder="XLM Wallet Public Address"
-                  onChange={formik.handleChange}
-                  value={formik.values.walletAddress}
-                />
-
-                <FormHelperText size="sm" color={"red"}>
-                  {formik.touched.walletAddress && formik.errors.walletAddress ? (
-                    formik.errors.walletAddress
-                  ) : (
-                    <FormErrorMessage>
-                      Your XLM wallet address is required
-                    </FormErrorMessage>
-                  )}
-                </FormHelperText>
-              </FormControl>
-
-              <HStack>
-                <Button
-                  onClick={formik.handleSubmit}
-                  isLoading={walletAddress.post.loading}
-                  type="submit"
-                  size="sm"
-                  bgGradient="linear(to-bl, #594bab,#4d2c58)"
-                  color="white"
-                  _hover={{ bgGradient: "linear(to-bl, #ada1ed,#8e55a1)" }}
-                >
-                  Save Address
-                </Button>
-                {/* <Button
-              size="sm"
-              onClick={() => connectWallet()}
-              bgGradient="linear(to-bl, #594bab,#4d2c58)"
-              _hover={{ bgGradient: "linear(to-bl, #ada1ed,#8e55a1)" }}
-              color="white"
-            >
-              Connect to XLM Wallet
-            </Button> */}
-              </HStack>
-            </>
-          ) : ("")}
+          <Button
+            mt={4}
+            onClick={formik.handleSubmit}
+            isLoading={walletAddress.post.loading}
+            type="submit"
+            size="sm"
+            colorScheme={"messenger"}
+          >
+            Submit
+          </Button>
         </Box>
       );
     }
@@ -713,12 +283,6 @@ const SettingsRoute = () => {
           </SimpleGrid>
         </Box>
       </Container>
-      {/* <Blur
-        position={"absolute"}
-        top={30}
-        left={-10}
-        style={{ filter: "blur(70px)" }}
-      /> */}
     </>
   );
 };
